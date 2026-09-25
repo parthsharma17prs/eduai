@@ -125,13 +125,13 @@ router.post('/generate', async (req, res) =>
         const {difficulty, topics, language}=req.body;
         if (!process.env.GROQ_API_KEY) return res.status(500).json({success: false, error: 'Groq API key not configured'});
 
-        const prompt=buildQuestionPrompt(difficulty, topics, language);
+        const model = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
         const response=await axios.post('https://api.groq.com/openai/v1/chat/completions', {
             messages: [
                 {role: 'system', content: 'You are an expert coding question generator. Return ONLY valid JSON. Every test case output MUST be correct. Test case inputs must be JSON objects.'},
                 {role: 'user', content: prompt}
             ],
-            model: 'llama-3.3-70b-versatile', temperature: 0.3, seed: Math.floor(Math.random()*10000), stream: false
+            model: model, temperature: 0.3, seed: Math.floor(Math.random()*10000), stream: false
         }, {headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`}});
 
         const question=parseQuestionResponse(response.data.choices[0].message.content);

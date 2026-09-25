@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proctoring Secondary Camera Stream</title>
+  <!-- Google Fonts Outfit & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-panel: rgba(17, 24, 39, 0.7);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --color-primary: #6366f1;
+      --color-primary-glow: rgba(99, 102, 241, 0.15);
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --text-main: #ffffff;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background orbs */
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+      opacity: 0.3;
+    }
+    .orb-1 {
+      width: 300px;
+      height: 300px;
+      background: var(--color-primary);
+      top: 10%;
+      left: 10%;
+    }
+    .orb-2 {
+      width: 250px;
+      height: 250px;
+      background: var(--color-success);
+      bottom: 15%;
+      right: 10%;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-panel);
+      border: 1px solid var(--panel-border);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 30px 24px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .logo i {
+      color: var(--color-primary);
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--panel-border);
+      margin-bottom: 24px;
+    }
+    .status-badge.connecting {
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.2);
+      background: rgba(245, 158, 11, 0.05);
+    }
+    .status-badge.streaming {
+      color: var(--color-success);
+      border-color: rgba(16, 185, 129, 0.2);
+      background: rgba(16, 185, 129, 0.05);
+    }
+    .status-badge.error {
+      color: var(--color-danger);
+      border-color: rgba(239, 68, 68, 0.2);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .video-preview-container {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #000000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      border: 1px solid var(--panel-border);
+      position: relative;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cam-label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cam-label span {
+      width: 6px;
+      height: 6px;
+      background: var(--color-danger);
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .status-badge.streaming ~ .video-preview-container .cam-label span {
+      background: var(--color-success);
+      box-shadow: 0 0 8px var(--color-success);
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      background: var(--color-primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px var(--color-primary-glow);
+    }
+    .btn:hover {
+      background: #4f46e5;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <div class="card">
+    <div class="logo">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>AI Interview Proctor</span>
+    </div>
+    
+    <h1>Secondary Mobile Camera</h1>
+    <p>Position this phone to the side of your desk to capture your keyboard, hands, and monitor screen.</p>
+    
+    <div class="status-badge connecting" id="status-indicator">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <span>Initializing WebRTC Session...</span>
+    </div>
+    
+    <div class="video-preview-container">
+      <video id="webcam" autoplay muted playsinline></video>
+      <div class="cam-label">
+        <span></span> LIVE FEED
+      </div>
+    </div>
+    
+    <button class="btn" id="retry-btn" style="display: none;" onclick="window.location.reload();">
+      Retry Connection
+    </button>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session');
+    
+    const statusIndicator = document.getElementById('status-indicator');
+    const webcamVideo = document.getElementById('webcam');
+    const retryBtn = document.getElementById('retry-btn');
+    
+    let localStream = null;
+    let peerConnection = null;
+
+    function setStatus(state, text) {
+      statusIndicator.className = `status-badge ${state}`;
+      let icon = '<i class="fa-solid fa-spinner fa-spin"></i>';
+      if (state === 'streaming') {
+        icon = '<i class="fa-solid fa-circle-check"></i>';
+      } else if (state === 'error') {
+        icon = '<i class="fa-solid fa-circle-xmark"></i>';
+      }
+      statusIndicator.innerHTML = `${icon} <span>${text}</span>`;
+    }
+
+    async function startMobileProctor() {
+      if (!sessionId) {
+        setStatus('error', 'Invalid Session Link');
+        return;
+      }
+
+      try {
+        setStatus('connecting', 'Requesting Camera Access...');
+        // Prefer rear-facing camera for wider desk view
+        localStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          },
+          audio: false
+        });
+        
+        webcamVideo.srcObject = localStream;
+
+        setStatus('connecting', 'Fetching SDP Offer from Desktop...');
+        const offerRes = await fetch(`/api/webrtc/offer?sessionId=${sessionId}`);
+        if (!offerRes.ok) {
+          throw new Error('Desktop session not ready or disconnected. Make sure the desktop lobby is open.');
+        }
+        const offerData = await offerRes.json();
+
+        setStatus('connecting', 'Connecting WebRTC Peer...');
+        peerConnection = new RTCPeerConnection({
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' }
+          ]
+        });
+
+        // Add local tracks to WebRTC
+        localStream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, localStream);
+        });
+
+        // Set remote offer
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offerData.offer));
+
+        // Create answer
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        // Wait for ICE candidate gathering to finish with a 3s timeout fallback
+        setStatus('connecting', 'Finalizing ICE Candidates...');
+        await new Promise((resolve) => {
+          if (peerConnection.iceGatheringState === 'complete') {
+            resolve();
+          } else {
+            const timeout = setTimeout(() => {
+              peerConnection.removeEventListener('icegatheringstatechange', checkState);
+              resolve();
+            }, 3000);
+
+            function checkState() {
+              if (peerConnection.iceGatheringState === 'complete') {
+                clearTimeout(timeout);
+                peerConnection.removeEventListener('icegatheringstatechange', checkState);
+                resolve();
+              }
+            }
+            peerConnection.addEventListener('icegatheringstatechange', checkState);
+          }
+        });
+
+        // Upload SDP answer
+        setStatus('connecting', 'Uploading WebRTC Answer...');
+        const answerRes = await fetch('/api/webrtc/answer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sessionId: sessionId,
+            answer: peerConnection.localDescription
+          })
+        });
+
+        if (!answerRes.ok) {
+          throw new Error('Failed to upload WebRTC answer to signaling channel.');
+        }
+
+        // Monitor connection state
+        peerConnection.addEventListener('connectionstatechange', () => {
+          if (peerConnection.connectionState === 'connected') {
+            setStatus('streaming', 'Streaming Active');
+          } else if (peerConnection.connectionState === 'disconnected' || peerConnection.connectionState === 'failed') {
+            setStatus('error', 'Connection Disconnected');
+            retryBtn.style.display = 'block';
+          }
+        });
+
+        // Fallback: If connectionState doesn't support listener, mark as streaming after a short delay
+        setTimeout(() => {
+          if (peerConnection && peerConnection.connectionState !== 'failed') {
+            setStatus('streaming', 'Streaming Active');
+          }
+        }, 1500);
+
+      } catch (err) {
+        console.error('Mobile WebRTC error:', err);
+        setStatus('error', err.message);
+        retryBtn.style.display = 'block';
+        if (localStream) {
+          localStream.getTracks().forEach(t => t.stop());
+        }
+      }
+    }
+
+    // Run automatically
+    window.addEventListener('load', startMobileProctor);
+  </script>
+</body>
+</html>

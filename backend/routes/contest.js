@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import axios from 'axios';
 import CodingContest from '../models/CodingContest.js';
 import {verifyAuth} from '../middleware/auth.js';
@@ -30,7 +31,7 @@ async function generateUniqueCode()
 
 async function callGroq(messages, opts={})
 {
-    const {model='llama-3.3-70b-versatile', temperature=0.6, max_tokens=4000}=opts;
+    const {model=process.env.GROQ_MODEL || 'openai/gpt-oss-120b', temperature=0.6, max_tokens=4000}=opts;
     const res=await axios.post(
         GROQ_URL,
         {messages, model, temperature, max_tokens},
@@ -247,12 +248,21 @@ router.get('/room/:code', async (req, res) =>
 // GET /api/contest/:id (host only)
 router.get('/:id', verifyAuth, async (req, res) =>
 {
-    const contest=await CodingContest.findById(req.params.id);
-    if (!contest) return res.status(404).json({success: false, error: 'Contest not found'});
-    if (String(contest.hostId)!==String(req.user.userId))
-        return res.status(403).json({success: false, error: 'Forbidden'});
+    try
+    {
+        if (!mongoose.isValidObjectId(req.params.id))
+            return res.status(404).json({success: false, error: 'Contest not found'});
 
-    return res.json({success: true, contest});
+        const contest=await CodingContest.findById(req.params.id);
+        if (!contest) return res.status(404).json({success: false, error: 'Contest not found'});
+        if (String(contest.hostId)!==String(req.user.userId))
+            return res.status(403).json({success: false, error: 'Forbidden'});
+
+        return res.json({success: true, contest});
+    } catch (err)
+    {
+        return res.status(500).json({success: false, error: err.message});
+    }
 });
 
 // PUT /api/contest/:id

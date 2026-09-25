@@ -278,7 +278,7 @@ Return ONLY valid JSON (no markdown, no backticks):
                 {role: 'system', content: 'You are an expert coding question generator like LeetCode. Return ONLY valid JSON. Every test case output MUST be correct. Test case inputs must be JSON objects with parameter names as keys.'},
                 {role: 'user', content: prompt}
             ],
-            model: 'llama-3.3-70b-versatile',
+            model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
             temperature: 0.4,
             seed: Math.floor(Math.random()*10000),
             stream: false
@@ -349,7 +349,7 @@ Give a helpful hint WITHOUT revealing the full solution. Be concise (2-3 sentenc
                     {role: 'system', content: 'You are a helpful coding tutor. Give hints, not solutions. Be encouraging and brief.'},
                     {role: 'user', content: prompt}
                 ],
-                model: 'llama-3.1-8b-instant',
+                model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
                 temperature: 0.7,
                 max_tokens: 200,
             },
@@ -429,7 +429,7 @@ Provide a comprehensive analysis. Return ONLY valid JSON:
                     {role: 'system', content: 'You are an expert code reviewer. Analyze code thoroughly and return only valid JSON. Be specific and practical.'},
                     {role: 'user', content: prompt}
                 ],
-                model: 'llama-3.3-70b-versatile',
+                model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
                 temperature: 0.2,
                 max_tokens: 1000,
             },
@@ -480,7 +480,7 @@ Use markdown formatting. Keep it concise but thorough.`;
                     {role: 'system', content: 'You are an expert programming assistant. Provide clear, working solutions. Use markdown with code blocks.'},
                     {role: 'user', content: systemPrompt}
                 ],
-                model: 'llama-3.3-70b-versatile',
+                model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
                 temperature: 0.3,
                 max_tokens: 1500,
             },

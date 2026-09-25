@@ -185,7 +185,7 @@ function CandidateDashboard()
               {
                 setMobileMenuOpen(false);
                 if (t.key==='profile') return navigate('/candidate-profile');
-                if (t.key==='ai-interview') return window.location.assign('https://ai-avatar.up.railway.app/');
+                if (t.key==='ai-interview') return navigate('/ai-avatar-interview');
                 setActiveTab(t.key);
               }}
             >
@@ -501,7 +501,7 @@ function DashboardTab({user, initials, setActiveTab})
           </div>
           <div className="cd-actions-grid">
             {visibleQuickActions.map((action) => (
-              <div className="cd-action-card" key={action.label} onClick={() => action.tab==='ai-interview'? window.location.assign('https://ai-avatar.up.railway.app/'):(action.link? navigate(action.link):setActiveTab(action.tab))}>
+              <div className="cd-action-card" key={action.label} onClick={() => action.tab==='ai-interview'? navigate('/ai-avatar-interview'):(action.link? navigate(action.link):setActiveTab(action.tab))}>
                 <div className="cd-action-top">
                   <div className="cd-action-icon">{action.icon}</div>
                   <span className="cd-action-badge">{action.badge}</span>
@@ -1142,16 +1142,29 @@ function AICallingTab({user})
   const [serverStatus, setServerStatus]=useState('checking');
   const [candidates, setCandidates]=useState([]);
   const [selectedCandidate, setSelectedCandidate]=useState('');
-  const [phoneNumber, setPhoneNumber]=useState('');
+  const [phoneNumber, setPhoneNumber]=useState('+918319556016');
+  const [otpCode, setOtpCode]=useState('');
+  const [otpSent, setOtpSent]=useState(false);
+  const [otpVerified, setOtpVerified]=useState(false);
+  const [sendingOtp, setSendingOtp]=useState(false);
+  const [verifyingOtp, setVerifyingOtp]=useState(false);
   const [callState, setCallState]=useState('idle'); // idle | calling | ringing | active | ended
   const [callInfo, setCallInfo]=useState(null);
   const [loading, setLoading]=useState(false);
   const [transcript, setTranscript]=useState([]);
   const [callDuration, setCallDuration]=useState(0);
   const [config, setConfig]=useState({ngrokUrl: '', hasTwilio: false, twilioPhone: ''});
+  const [customNgrok, setCustomNgrok]=useState('');
+  const [savingConfig, setSavingConfig]=useState(false);
   const transcriptRef=useRef(null);
   const timerRef=useRef(null);
   const pollRef=useRef(null);
+
+  const isNumberPreVerified=(num) =>
+  {
+    const clean=(num||'').replace(/[\s\-\(\)]/g, '');
+    return clean.endsWith('8319556016');
+  };
 
   useEffect(() =>
   {
@@ -1180,7 +1193,68 @@ function AICallingTab({user})
     {
       const res=await api.get('/ai-calling/config');
       setConfig(res.data);
+      if (res.data.ngrokUrl) setCustomNgrok(res.data.ngrokUrl);
     } catch { /* ignore */}
+  };
+
+  const handleSaveNgrok=async () =>
+  {
+    setSavingConfig(true);
+    try
+    {
+      const res=await api.post('/ai-calling/config', {ngrokUrl: customNgrok});
+      setConfig(prev => ({...prev, ngrokUrl: res.data.ngrokUrl}));
+      alert('Webhook/NGROK URL updated successfully!');
+    } catch (err)
+    {
+      alert('Failed to save NGROK URL');
+    } finally
+    {
+      setSavingConfig(false);
+    }
+  };
+
+  const handleSendOtp=async () =>
+  {
+    if (!phoneNumber.trim()) return alert('Please enter a phone number');
+    setSendingOtp(true);
+    try
+    {
+      const res=await api.post('/ai-calling/send-otp', {phoneNumber: phoneNumber.trim()});
+      setOtpSent(true);
+      if (res.data.verified) setOtpVerified(true);
+      alert(res.data.message||'OTP sent successfully!');
+    } catch (err)
+    {
+      alert(err.response?.data?.message||'Failed to send OTP');
+    } finally
+    {
+      setSendingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp=async () =>
+  {
+    if (!otpCode.trim()) return alert('Please enter the OTP code');
+    setVerifyingOtp(true);
+    try
+    {
+      const res=await api.post('/ai-calling/verify-otp', {
+        phoneNumber: phoneNumber.trim(),
+        otp: otpCode.trim(),
+      });
+      if (res.data.verified)
+      {
+        setOtpVerified(true);
+        alert(res.data.message||'Phone verified successfully!');
+      }
+    } catch (err)
+    {
+      alert(err.response?.data?.message||'Invalid OTP code');
+    } finally
+    {
+      setVerifyingOtp(false);
+    }
   };
 
   const checkServerStatus=async () =>
@@ -1216,6 +1290,10 @@ function AICallingTab({user})
   const handleInitiateCall=async () =>
   {
     if (!phoneNumber.trim()) return alert('Please enter a phone number');
+    if (!isNumberPreVerified(phoneNumber)&&!otpVerified)
+    {
+      return alert('OTP verification required for phone numbers other than +918319556016. Please click Send OTP and verify first.');
+    }
     setLoading(true);
     setCallState('calling');
     setTranscript([]);
@@ -1226,6 +1304,7 @@ function AICallingTab({user})
       const res=await api.post('/ai-calling/initiate-call', {
         phoneNumber: phoneNumber.trim(),
         candidateId: selectedCandidate||undefined,
+        ngrokUrl: customNgrok.trim()||undefined,
       });
       setCallInfo(res.data);
       setCallState('ringing');
@@ -1306,9 +1385,94 @@ function AICallingTab({user})
 
   return (
     <div className="cd-container cd-tab-content">
-      <div className="cd-welcome">
-        <h1>AI Phone Interview</h1>
-        <p>Live AI-powered voice interviews via Twilio — automated and real-time</p>
+      <div className="cd-welcome" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h1>AI Phone Interview</h1>
+          <p>Live AI-powered voice interviews via Twilio & Ultravox — automated and real-time</p>
+        </div>
+        <a
+          href="https://youtu.be/X7wJoscMq6A?si=-YaKwzva1m2CD9Fi"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+            color: '#ffffff',
+            padding: '10px 18px',
+            borderRadius: '10px',
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            textDecoration: 'none',
+            boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+          onMouseOut={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+          Watch AI Calling Demo
+        </a>
+      </div>
+
+      {/* Demo Video Banner Card */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(30, 41, 59, 0.6))',
+        border: '1px solid rgba(239, 68, 68, 0.3)',
+        borderRadius: '12px',
+        padding: '14px 20px',
+        marginBottom: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            background: '#ef4444',
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff'
+          }}>
+            ▶
+          </div>
+          <div>
+            <div style={{ fontWeight: 600, color: '#f8fafc', fontSize: '0.95rem' }}>
+              Official AI Voice Calling Walkthrough & Demo
+            </div>
+            <div style={{ color: '#94a3b8', fontSize: '0.8rem' }}>
+              See how our Twilio + Ultravox real-time conversational voice agent conducts automated candidate screenings.
+            </div>
+          </div>
+        </div>
+        <a
+          href="https://youtu.be/X7wJoscMq6A?si=-YaKwzva1m2CD9Fi"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: '#e2e8f0',
+            padding: '6px 14px',
+            borderRadius: '8px',
+            fontSize: '0.85rem',
+            fontWeight: 500,
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          Open Video ↗
+        </a>
       </div>
 
       {/* Status Indicators */}
@@ -1343,15 +1507,93 @@ function AICallingTab({user})
               </div>
               <div className="aic-form">
                 <div className="aic-form-group">
-                  <label>Phone Number</label>
-                  <input
-                    type="tel"
-                    placeholder="+91 XXXXX XXXXX"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="aic-input"
-                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <label style={{ margin: 0 }}>Phone Number</label>
+                    {isNumberPreVerified(phoneNumber) ? (
+                      <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600, background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '12px' }}>
+                        ✅ Pre-verified (+918319556016)
+                      </span>
+                    ) : otpVerified ? (
+                      <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600, background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '12px' }}>
+                        ✅ OTP Verified
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 600, background: 'rgba(245, 158, 11, 0.1)', padding: '2px 8px', borderRadius: '12px' }}>
+                        ⚠️ OTP Required
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="tel"
+                      placeholder="+91 XXXXX XXXXX"
+                      value={phoneNumber}
+                      onChange={(e) => {
+                        setPhoneNumber(e.target.value);
+                        setOtpVerified(false);
+                        setOtpSent(false);
+                      }}
+                      className="aic-input"
+                    />
+                    {!isNumberPreVerified(phoneNumber) && !otpVerified && (
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={sendingOtp || !phoneNumber.trim()}
+                        style={{ padding: '0 12px', whiteSpace: 'nowrap', borderRadius: '8px', background: '#d97706', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                      >
+                        {sendingOtp ? 'Sending...' : otpSent ? 'Resend OTP' : 'Send OTP'}
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {!isNumberPreVerified(phoneNumber) && !otpVerified && otpSent && (
+                  <div className="aic-form-group" style={{ background: 'rgba(245, 158, 11, 0.05)', padding: '12px', borderRadius: '8px', border: '1px dashed #d97706' }}>
+                    <label style={{ color: '#d97706' }}>Enter OTP Code (Test Code: 482910)</label>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                      <input
+                        type="text"
+                        placeholder="Enter 6-digit OTP"
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value)}
+                        className="aic-input"
+                        maxLength={6}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleVerifyOtp}
+                        disabled={verifyingOtp || !otpCode.trim()}
+                        style={{ padding: '0 14px', whiteSpace: 'nowrap', borderRadius: '8px', background: '#10b981', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                      >
+                        {verifyingOtp ? 'Verifying...' : 'Verify OTP'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="aic-form-group">
+                  <label>NGROK / Webhook Tunnel URL (Optional with Ultravox)</label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="url"
+                      placeholder="https://xxxx.ngrok-free.app"
+                      value={customNgrok}
+                      onChange={(e) => setCustomNgrok(e.target.value)}
+                      className="aic-input"
+                    />
+                    <button
+                      type="button"
+                      className="aic-save-btn"
+                      onClick={handleSaveNgrok}
+                      disabled={savingConfig}
+                      style={{ padding: '0 12px', whiteSpace: 'nowrap', borderRadius: '8px', background: '#4f46e5', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      {savingConfig ? '...' : 'Save'}
+                    </button>
+                  </div>
+                </div>
+
                 <div className="aic-form-group">
                   <label>Candidate Profile</label>
                   <select value={selectedCandidate} onChange={(e) => setSelectedCandidate(e.target.value)} className="aic-select">

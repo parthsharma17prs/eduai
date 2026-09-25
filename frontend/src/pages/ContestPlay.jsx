@@ -394,6 +394,14 @@ export default function ContestPlay()
                             <span><Clock size={14} /> Duration: {Math.round(durationSec/60)} min</span>
                         </div>
                     </div>
+                    <button
+                        type="button"
+                        className="cp-btn-submit"
+                        style={{ margin: '1rem 0', padding: '0.85rem 2rem', fontSize: '1.05rem', fontWeight: 600, background: 'linear-gradient(135deg, #22c55e, #16a34a)', borderRadius: '10px', color: '#fff', border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)' }}
+                        onClick={() => socketRef.current?.emit('contest:start', { code })}
+                    >
+                        🚀 Start Test Immediately
+                    </button>
                     {/* Camera preview while waiting */}
                     <div className="cp-waiting-camera">
                         <div className="cp-video-wrap">

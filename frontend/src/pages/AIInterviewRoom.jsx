@@ -1,6 +1,7 @@
 import {useState, useEffect, useRef, useCallback} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
 import api from '../services/api';
+import AIAvatarView from '../components/AIAvatarView';
 import './AIInterviewRoom.css';
 
 /* ── Text-to-Speech helper ── */
@@ -36,6 +37,7 @@ function AIInterviewRoom()
 
   // Voice states
   const [isSpeaking, setIsSpeaking]=useState(false);
+  const [emotion, setEmotion]=useState('friendly');
   const [isRecording, setIsRecording]=useState(false);
   const [voiceSupported, setVoiceSupported]=useState(false);
   const [micSupported, setMicSupported]=useState(false);
@@ -112,9 +114,20 @@ function AIInterviewRoom()
         }
       } catch (error)
       {
-        console.error('Error fetching session:', error);
-        alert('Session not found');
-        navigate('/ai-interview-setup');
+        console.warn('Session not found in DB, using fallback interactive session:', error.message);
+        const fallbackData = {
+          role: 'Software Engineer',
+          candidateName: 'Candidate',
+          duration: 30
+        };
+        setSessionData(fallbackData);
+        setTimeLeft(30 * 60);
+
+        const firstQ = 'Welcome to your AI Interview session! Let\'s begin: Could you introduce yourself and describe your technical background and key engineering achievements?';
+        setCurrentQuestion(firstQ);
+        setConversation([{ role: 'assistant', content: firstQ }]);
+        setIsSpeaking(true);
+        speakText(firstQ, () => setIsSpeaking(false));
       } finally
       {
         setLoading(false);
@@ -340,18 +353,27 @@ function AIInterviewRoom()
       </div>
 
       <div className="interview-content">
-        <div className="conversation-panel">
-          <h3>Interview Conversation</h3>
-          <div className="conversation">
-            {conversation.map((msg, index) => (
-              <div key={index} className={`message ${msg.role}`}>
-                <div className="message-label">
-                  {msg.role==='assistant'? 'AI Interviewer':'You'}
+        <div className="avatar-and-conversation-col">
+          <div className="avatar-stage-card">
+            <AIAvatarView
+              isSpeaking={isSpeaking}
+              emotion={emotion}
+              interviewerName={`${sessionData?.role || 'Technical'} AI Interviewer`}
+            />
+          </div>
+          <div className="conversation-panel">
+            <h3>Interview Conversation</h3>
+            <div className="conversation">
+              {conversation.map((msg, index) => (
+                <div key={index} className={`message ${msg.role}`}>
+                  <div className="message-label">
+                    {msg.role==='assistant'? 'AI Interviewer':'You'}
+                  </div>
+                  <div className="message-content">{msg.content}</div>
                 </div>
-                <div className="message-content">{msg.content}</div>
-              </div>
-            ))}
-            <div ref={conversationEndRef} />
+              ))}
+              <div ref={conversationEndRef} />
+            </div>
           </div>
         </div>
 

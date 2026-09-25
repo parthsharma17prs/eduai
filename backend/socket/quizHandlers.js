@@ -128,6 +128,19 @@ export function setupQuizSocketHandlers(io)
                 socket.join(room);
                 socketMeta.set(socket.id, {quizId, role: 'participant', name: name.trim(), participantId: socket.id});
 
+                // Auto-start immediately if waiting or draft with questions so participants do not wait
+                if (['waiting', 'draft'].includes(quiz.status) && quiz.questions.length > 0)
+                {
+                    const now = new Date();
+                    const durationMs = (quiz.duration || 60) * 60 * 1000;
+                    quiz.status = 'active';
+                    quiz.startedAt = now;
+                    quiz.endsAt = new Date(now.getTime() + durationMs);
+                    quiz.currentQuestionIndex = 0;
+                    await quiz.save();
+                    scheduleAutoEnd(io, quizId, durationMs);
+                }
+
                 // Init session if not already
                 if (!activeSessions.has(quizId))
                 {
@@ -154,19 +167,25 @@ export function setupQuizSocketHandlers(io)
             }
         });
 
-        // ── Host starts quiz (self-paced: all questions open at once) ─────
+        // ── Start quiz (self-paced: all questions open at once) ─────
         socket.on('quiz:start', async ({quizId}={}) =>
         {
             try
             {
                 const meta=socketMeta.get(socket.id);
-                if (!meta||meta.role!=='host'||meta.quizId!==quizId)
-                    return socket.emit('quiz:error', {message: 'Only the host can start the quiz'});
+                const targetQuizId = quizId || meta?.quizId;
+                if (!targetQuizId) return socket.emit('quiz:error', {message: 'quizId required'});
 
-                const quiz=await Quiz.findById(quizId);
+                const quiz=await Quiz.findById(targetQuizId);
                 if (!quiz) return socket.emit('quiz:error', {message: 'Quiz not found'});
                 if (!['waiting', 'draft'].includes(quiz.status))
+                {
+                    if (quiz.status === 'active') {
+                        const payload = buildParticipantJoinPayload(quiz, socket.id);
+                        return socket.emit('quiz:started', payload);
+                    }
                     return socket.emit('quiz:error', {message: 'Quiz cannot be started from its current state'});
+                }
                 if (quiz.questions.length===0)
                     return socket.emit('quiz:error', {message: 'Add questions before starting'});
 

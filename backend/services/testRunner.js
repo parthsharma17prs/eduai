@@ -184,7 +184,7 @@ class TestRunner
         {
             switch (language)
             {
-                case 'python': filePath=path.join(this.tempDir, `${fileId}.py`); await fs.writeFile(filePath, code); command=`python "${filePath}"`; break;
+                case 'python': filePath=path.join(this.tempDir, `${fileId}.py`); await fs.writeFile(filePath, code); command=`python3 "${filePath}"`; break;
                 case 'javascript': filePath=path.join(this.tempDir, `${fileId}.js`); await fs.writeFile(filePath, code); command=`node "${filePath}"`; break;
                 case 'java': filePath=path.join(this.tempDir, `Main.java`); await fs.writeFile(filePath, code); command=`cd "${this.tempDir}" && javac Main.java && java Main`; break;
                 case 'cpp': filePath=path.join(this.tempDir, `${fileId}.cpp`); const exePath=path.join(this.tempDir, `${fileId}.exe`); await fs.writeFile(filePath, code); command=`g++ "${filePath}" -o "${exePath}" && "${exePath}"`; break;

@@ -297,9 +297,14 @@ function Home()
             features: ['11+ curated problems', 'Multiple languages', 'AI-generated problems', 'Smart hints'],
         },
         {
-            icon: RobotIcon, badge: 'AI', badgeAccent: true, title: 'AI Interviewer',
-            description: 'Get interviewed by AI with comprehensive evaluation',
-            features: ['Role-based questions', 'Voice or text answers', 'Multi-metric scoring', 'Hiring recommendations'],
+            icon: RobotIcon, badge: 'AI Avatar', badgeAccent: true, title: '3D AI Avatar Interview',
+            description: 'Next-gen 3D virtual interviewer call with real-time lip-sync',
+            features: ['3D animated avatar', 'Speech-to-text & TTS', 'Resume CV skills parsing', 'Comprehensive evaluation'],
+        },
+        {
+            icon: ZapIcon, badge: 'Voice AI', badgeAccent: true, title: 'AI Phone Calling (Twilio + Ultravox)',
+            description: 'Automated live telephone phone screen interviews',
+            features: ['Direct phone outbound calls', 'Ultravox real-time voice streaming', 'Automated transcript generation', 'OTP verification support'],
         },
     ];
 
@@ -379,6 +384,27 @@ function Home()
                         >
                             Sign In
                         </motion.button>
+                        <motion.a
+                            href="https://youtu.be/X7wJoscMq6A?si=-YaKwzva1m2CD9Fi"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-large"
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                background: 'rgba(239, 68, 68, 0.15)',
+                                color: '#f87171',
+                                border: '1px solid rgba(239, 68, 68, 0.4)',
+                                textDecoration: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 600,
+                            }}
+                            whileHover={{scale: 1.05, background: 'rgba(239, 68, 68, 0.25)'}}
+                            whileTap={{scale: 0.95}}
+                        >
+                            ▶ Watch AI Calling Demo
+                        </motion.a>
                     </motion.div>
 
                     <ScrollIndicator />

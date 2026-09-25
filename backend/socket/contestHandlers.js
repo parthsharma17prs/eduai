@@ -179,6 +179,18 @@ export function setupContestSocketHandlers(io)
                 socket.join(room);
                 socketMeta.set(socket.id, {contestId, role: 'participant', name: name.trim(), participantId: socket.id});
 
+                // Auto-start immediately if waiting or draft with challenges so participants don't wait
+                if (['waiting', 'draft'].includes(contest.status) && contest.challenges.length > 0)
+                {
+                    const now = new Date();
+                    const durationMs = (contest.duration || 90) * 60 * 1000;
+                    contest.status = 'active';
+                    contest.startedAt = now;
+                    contest.endsAt = new Date(now.getTime() + durationMs);
+                    await contest.save();
+                    scheduleAutoEnd(io, contestId, durationMs);
+                }
+
                 if (!activeSessions.has(contestId))
                 {
                     activeSessions.set(contestId, {contest, autoEndTimer: null, progressInterval: null});
@@ -201,19 +213,25 @@ export function setupContestSocketHandlers(io)
             }
         });
 
-        // ── Host starts contest ───────────────────────────────────────────
+        // ── Start contest ───────────────────────────────────────────
         socket.on('contest:start', async ({contestId}={}) =>
         {
             try
             {
                 const meta=socketMeta.get(socket.id);
-                if (!meta||meta.role!=='host'||meta.contestId!==contestId)
-                    return socket.emit('contest:error', {message: 'Only the host can start the contest'});
+                const targetContestId = contestId || meta?.contestId;
+                if (!targetContestId) return socket.emit('contest:error', {message: 'contestId required'});
 
-                const contest=await CodingContest.findById(contestId);
+                const contest=await CodingContest.findById(targetContestId);
                 if (!contest) return socket.emit('contest:error', {message: 'Contest not found'});
                 if (!['waiting', 'draft'].includes(contest.status))
+                {
+                    if (contest.status === 'active') {
+                        const payload = buildParticipantJoinPayload(contest, socket.id);
+                        return socket.emit('contest:started', payload);
+                    }
                     return socket.emit('contest:error', {message: 'Contest cannot be started from its current state'});
+                }
                 if (contest.challenges.length===0)
                     return socket.emit('contest:error', {message: 'Add challenges before starting'});
 

@@ -4,6 +4,9 @@ import './config.js';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+import fs from 'fs';
+import {fileURLToPath} from 'url';
 import {createServer} from 'http';
 import {Server} from 'socket.io';
 import {connectMongoDB} from './db/mongodb.js';
@@ -43,6 +46,9 @@ import {securityHeadersMiddleware} from './middleware/securityHeaders.js';
 import {csrfTokenMiddleware, verifyCSRFToken} from './middleware/csrf.js';
 import {initializeLogging, logger} from './services/logging.js';
 import {initializeRedis} from './services/cache.js';
+
+const __filename=fileURLToPath(import.meta.url);
+const __dirname=path.dirname(__filename);
 import {startOTPCleanupScheduler} from './scheduler/otpCleanup.js';
 import {setupAPIVersioning} from './middleware/apiVersioning.js';
 
@@ -200,6 +206,7 @@ app.use('/api/verification', verificationRoutes);
 app.use('/api/ai-calling', aiCallingRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/contest', contestRoutes);
+app.use('/api/contests', contestRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/feature-config', featureConfigRoutes);
@@ -242,7 +249,23 @@ app.get('/live', (req, res) =>
     res.status(200).json({alive: true});
 });
 
-// 404 handler for unmatchedroutes
+// Serve frontend static build (Railway / Production deployment)
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(frontendDistPath))
+{
+    console.log('[SERVER] Serving static frontend build from:', frontendDistPath);
+    app.use(express.static(frontendDistPath));
+    app.get('*', (req, res, next) =>
+    {
+        if (req.path.startsWith('/api') || req.path.startsWith('/socket.io') || req.path.startsWith('/twiml') || req.path.startsWith('/webhook'))
+        {
+            return next();
+        }
+        res.sendFile(path.join(frontendDistPath, 'index.html'));
+    });
+}
+
+// 404 handler for unmatched API routes
 app.use((req, res) =>
 {
     res.status(404).json({

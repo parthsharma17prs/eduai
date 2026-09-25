@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Recruiter Mock Interview - Premium 3D Calling</title>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- App Styling -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!-- Import Map for ES Modules (Three.js) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/"
+      }
+    }
+  </script>
+  <!-- TensorFlow.js and BlazeFace for Client-Side Webcam Proctoring -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
+  <!-- PDF.js for Client-Side Resume Parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <!-- Pyodide for Client-Side Python Execution -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
+  <!-- QRious for Instant Client-Side QR Code Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+</head>
+
+<body>
+
+  <!-- Background Animated Orbs for Premium Aesthetic -->
+  <div class="glass-bg">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- LOBBY SCREEN -->
+    <main id="lobby-screen" class="screen-view active">
+      <header class="lobby-header">
+        <div class="logo">
+          <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+          <span>AI Interviewer <span class="badge">3D Virtual Call</span></span>
+        </div>
+        <h1>Next-Gen AI Mock Interviewer</h1>
+        <p>Experience an immersive, voice-interactive interview with our 3D AI Recruiter avatar.</p>
+      </header>
+
+      <div class="lobby-grid">
+        <!-- Setup Form -->
+        <section class="glass-panel setup-panel">
+          <h2><i class="fa-solid fa-sliders icon-accent"></i> Configure Interview</h2>
+          <form id="setup-form">
+            <div class="form-group">
+              <label for="candidate-name">Full Name</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="candidate-name" placeholder="John Doe" required value="John Doe">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="interview-mode"><i class="fa-solid fa-circle-nodes icon-accent"></i> Interview Customization
+                Mode</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-sliders"></i>
+                <select id="interview-mode">
+                  <option value="topic" selected>Topic-wise (Custom Role/Subject)</option>
+                  <option value="resume">Resume-based (CV Skills Parsing)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" id="topic-input-group">
+              <label for="interview-topic">Interview Topic / Role</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-briefcase"></i>
+                <input type="text" id="interview-topic"
+                  placeholder="e.g. React Developer, Data Scientist, Product Manager" required value="React Developer">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="interview-difficulty">Target Level</label>
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-layer-group"></i>
+                  <select id="interview-difficulty">
+                    <option value="Junior">Junior</option>
+                    <option value="Mid-Level" selected>Mid-Level</option>
+                    <option value="Senior">Senior</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group half">
+                <label for="question-count">Questions</label>
+                <div class="input-wrapper">
+                  <i class="fa-solid fa-list-ol"></i>
+                  <select id="question-count">
+                    <option value="3">3 Questions</option>
+                    <option value="5" selected>5 Questions</option>
+                    <option value="8">8 Questions</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="include-coding"><i class="fa-solid fa-code icon-accent"></i> Include Coding Challenge?</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-circle-question"></i>
+                <select id="include-coding">
+                  <option value="yes" selected>Yes, include coding assessment</option>
+                  <option value="no">No, theory questions only</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group hidden-mode" id="resume-upload-group">
+              <label><i class="fa-solid fa-file-pdf icon-accent"></i> Customize Interview via Resume (PDF / TXT)</label>
+              <div class="input-wrapper"
+                style="border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; align-items: center; justify-content: center; cursor: pointer; background: rgba(255, 255, 255, 0.01);"
+                onclick="document.getElementById('resume-upload').click();">
+                <i class="fa-solid fa-cloud-arrow-up"
+                  style="position: static; font-size: 24px; color: var(--text-muted); margin-bottom: 4px;"></i>
+                <span id="resume-upload-label"
+                  style="font-size: 13px; color: var(--text-muted); font-weight: 500;">Click to upload resume</span>
+                <input type="file" id="resume-upload" accept=".pdf,.txt" style="display: none;">
+              </div>
+              <div id="resume-status"
+                style="font-size: 12px; color: var(--color-success); margin-top: 8px; font-weight: 600; display: none;">
+                <i class="fa-solid fa-circle-check"></i> Resume parsed: <span id="resume-details"
+                  style="color: #ffffff;">0 skills</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="groq-key">Groq API Key <span class="label-hint">(Optional - leaves server-side fallback active
+                  if empty)</span></label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-key"></i>
+                <input type="password" id="groq-key" placeholder="Groq API Key (Will be saved locally in your browser)">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+              <span>Start Mock Interview</span>
+              <i class="fa-solid fa-video-slash video-ready-icon"></i>
+            </button>
+          </form>
+        </section>
+
+        <!-- Device Tester -->
+        <section class="glass-panel test-panel">
+          <h2><i class="fa-solid fa-camera icon-accent"></i> Device Setup</h2>
+          <p class="section-desc">Test your webcam and audio before launching the call.</p>
+
+          <div class="test-video-container">
+            <video id="lobby-preview" autoplay muted playsinline></video>
+            <div class="test-video-overlay" id="lobby-preview-overlay">
+              <i class="fa-solid fa-video-slash"></i>
+              <p>Webcam is starting...</p>
+            </div>
+            <!-- Lobby Mic Volume Indicator -->
+            <div class="lobby-volume-bar-container">
+              <div id="lobby-volume-indicator"></div>
+            </div>
+          </div>
+
+          <div class="device-status">
+            <div class="status-item">
+              <span class="status-dot green" id="cam-status"></span>
+              <span>Webcam Connection</span>
+            </div>
+            <div class="status-item">
+              <span class="status-dot green" id="mic-status"></span>
+              <span>Microphone Input</span>
+            </div>
+          </div>
+
+          <!-- Hardware Device Selectors -->
+          <div class="device-selectors">
+            <div class="form-group">
+              <label for="camera-select"><i class="fa-solid fa-video icon-accent"></i> Camera</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-camera"></i>
+                <select id="camera-select">
+                  <option value="">Default Camera</option>
+                </select>
+            </div>
+
+            <!-- Secondary Camera Config -->
+            <div class="form-group">
+              <label for="secondary-camera-mode"><i class="fa-solid fa-camera-rotate icon-accent"></i> Secondary Camera (Mobile / Side View)</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                <select id="secondary-camera-mode" required>
+                  <option value="" disabled selected>Select secondary camera option... (Compulsory)</option>
+                  <option value="webcam">Select another connected USB webcam</option>
+                  <option value="phone">Use Mobile Phone (via WebRTC QR Code)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- USB Secondary Camera Dropdown (Hidden by default) -->
+            <div class="form-group" id="secondary-camera-select-group" style="display: none;">
+              <label for="secondary-camera-select">Select USB Webcam</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-camera"></i>
+                <select id="secondary-camera-select">
+                  <option value="">Choose camera...</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Phone Connection Instructions & QR Code (Hidden by default) -->
+            <div class="form-group" id="phone-camera-connect-group" style="display: none; background: rgba(255, 255, 255, 0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--panel-border); text-align: center;">
+              <label style="display: block; font-weight: 600; margin-bottom: 8px;">Scan to Connect Phone</label>
+              <div id="phone-qr-container" style="margin: 12px auto; width: 150px; height: 150px; background: #ffffff; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                <!-- QR Image injected dynamically -->
+                <i class="fa-solid fa-spinner fa-spin" style="color: #6366f1; font-size: 24px;"></i>
+              </div>
+              <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin: 8px 0 0 0;">
+                Connect your phone to the <strong>same Wi-Fi network</strong>, scan the QR code, and allow camera permissions to stream live.
+              </p>
+              <div id="phone-status-info" style="font-size: 12px; font-weight: 600; color: #f59e0b; margin-top: 8px; display: inline-flex; align-items: center; gap: 6px;">
+                <span class="status-dot-blink" style="width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; display: inline-block;"></span>
+                <span>Waiting for phone connection...</span>
+              </div>
+            </div>
+            
+
+            <div class="form-group">
+              <label for="mic-select"><i class="fa-solid fa-microphone icon-accent"></i> Microphone</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-microphone-lines"></i>
+                <select id="mic-select">
+                  <option value="">Default Microphone</option>
+                </select>
+              </div>
+              <button type="button" id="test-mic-btn" class="btn btn-secondary-icon btn-block"
+                style="margin-top: 10px; font-size: 13.5px; height: auto; padding: 10px 14px; display: inline-flex; aspect-ratio: auto; gap: 8px;">
+                <i class="fa-solid fa-microphone"></i> Test Microphone (Record & Playback)
+              </button>
+            </div>
+
+            <div class="form-group" id="speaker-select-group">
+              <label for="speaker-select"><i class="fa-solid fa-volume-high icon-accent"></i> Audio Output
+                (Speaker)</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-headphones"></i>
+                <select id="speaker-select">
+                  <option value="">Default Speaker</option>
+                </select>
+              </div>
+              <button type="button" id="test-speaker-btn" class="btn btn-secondary-icon btn-block"
+                style="margin-top: 10px; font-size: 13.5px; height: auto; padding: 10px 14px; display: inline-flex; aspect-ratio: auto; gap: 8px;">
+                <i class="fa-solid fa-circle-play"></i> Test Speaker Voice
+              </button>
+              <div class="glass-alert warning"
+                style="margin-top: 10px; display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 10px;">
+                <i class="fa-solid fa-circle-exclamation" style="font-size: 15px; margin-top: 2px;"></i>
+                <p style="font-size: 12px; line-height: 1.4; color: var(--text-muted); margin: 0; text-align: left;">
+                  <strong style="color: var(--color-warning);">Browser Notice:</strong> The AI recruiter's spoken voice
+                  (Speech Synthesis) will play through your operating system's <strong>default output device</strong>.
+                  If you cannot hear the voice in your headphones, make sure they are set as the default playback device
+                  in your Windows/macOS sound settings.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-alert">
+            <i class="fa-solid fa-circle-info"></i>
+            <p>Ensure you are in a quiet, well-lit room for the best speech recognition and camera quality.</p>
+          </div>
+        </section>
+
+        <!-- Proctoring Guidelines & Rules (Fills the space professionally on wide screens) -->
+        <section class="glass-panel rules-panel">
+          <h2><i class="fa-solid fa-shield-halved icon-accent"></i> Proctoring Rules</h2>
+          <p class="section-desc">Please review the proctoring guidelines before starting the session.</p>
+
+          <ul class="rules-list"
+            style="list-style: none; display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+            <li style="display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: var(--text-muted);">
+              <i class="fa-solid fa-expand icon-accent"
+                style="font-size: 15px; margin-top: 3px; min-width: 20px; text-align: center;"></i>
+              <div>
+                <strong style="color: var(--text-main);">Full Screen Lock</strong>
+                <p style="font-size: 12px; margin-top: 2px; color: var(--text-muted);">Enforces fullscreen. Exiting
+                  triggers an immediate warning and pauses the session.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: var(--text-muted);">
+              <i class="fa-solid fa-ban icon-accent"
+                style="font-size: 15px; margin-top: 3px; min-width: 20px; text-align: center;"></i>
+              <div>
+                <strong style="color: var(--text-main);">Copy-Paste Block</strong>
+                <p style="font-size: 12px; margin-top: 2px; color: var(--text-muted);">Right-click context menus,
+                  copy/paste, and Developer Tools keyboard shortcuts are deactivated.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: var(--text-muted);">
+              <i class="fa-solid fa-window-restore icon-accent"
+                style="font-size: 15px; margin-top: 3px; min-width: 20px; text-align: center;"></i>
+              <div>
+                <strong style="color: var(--text-main);">Tab & Focus Tracking</strong>
+                <p style="font-size: 12px; margin-top: 2px; color: var(--text-muted);">Navigating to other windows,
+                  switching browser tabs, or losing focus triggers warning popups.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: var(--text-muted);">
+              <i class="fa-solid fa-user-shield icon-accent"
+                style="font-size: 15px; margin-top: 3px; min-width: 20px; text-align: center;"></i>
+              <div>
+                <strong style="color: var(--text-main);">Webcam & Eyeball Gaze Tracking</strong>
+                <p style="font-size: 12px; margin-top: 2px; color: var(--text-muted);">AI face count tracking + MediaPipe 478-point eyeball iris mesh analysis flags sideways looking away or head turn actions.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: var(--text-muted);">
+              <i class="fa-solid fa-mobile-screen-button icon-accent"
+                style="font-size: 15px; margin-top: 3px; min-width: 20px; text-align: center;"></i>
+              <div>
+                <strong style="color: var(--text-main);">Compulsory Secondary Feed</strong>
+                <p style="font-size: 12px; margin-top: 2px; color: var(--text-muted);">Connecting a secondary webcam or phone camera stream is mandatory. Scanned every 3s via Groq Vision API for mobile device usage.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: var(--text-muted);">
+              <i class="fa-solid fa-desktop icon-accent"
+                style="font-size: 15px; margin-top: 3px; min-width: 20px; text-align: center;"></i>
+              <div>
+                <strong style="color: var(--text-main);">Secondary Monitors</strong>
+                <p style="font-size: 12px; margin-top: 2px; color: var(--text-muted);">Connecting secondary screens or
+                  extended displays is prohibited and checked continuously.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: var(--text-muted);">
+              <i class="fa-solid fa-camera icon-accent"
+                style="font-size: 15px; margin-top: 3px; min-width: 20px; text-align: center;"></i>
+              <div>
+                <strong style="color: var(--text-main);">Hardware Source Checks</strong>
+                <p style="font-size: 12px; margin-top: 2px; color: var(--text-muted);">Muting or disabling your
+                  webcam/microphone at the hardware source triggers warnings.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: var(--text-muted);">
+              <i class="fa-solid fa-volume-high icon-accent"
+                style="font-size: 15px; margin-top: 3px; min-width: 20px; text-align: center;"></i>
+              <div>
+                <strong style="color: var(--text-main);">Audio Noise Analysis</strong>
+                <p style="font-size: 12px; margin-top: 2px; color: var(--text-muted);">Continuous background speech,
+                  whispering, or prompter voices trigger audio warnings.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; font-size: 13px; line-height: 1.4; color: var(--text-muted);">
+              <i class="fa-solid fa-triangle-exclamation icon-accent"
+                style="font-size: 15px; margin-top: 3px; min-width: 20px; text-align: center;"></i>
+              <div>
+                <strong style="color: var(--text-main);">Strict Violation Limits</strong>
+                <p style="font-size: 12px; margin-top: 2px; color: var(--text-muted);">General violations allow 5 strikes max, while secondary feed mobile phone detection terminates on the 3rd strike.</p>
+              </div>
+            </li>
+          </ul>
+
+          <div class="glass-alert"
+            style="background: rgba(239, 68, 68, 0.03); border: 1px solid rgba(239, 68, 68, 0.15);">
+            <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-danger);"></i>
+            <p style="font-size: 12.5px; color: var(--text-muted);">Attempts to bypass security features are recorded in
+              the final evaluation report.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- INTERVIEW SCREEN (CALL INTERFACE) -->
+    <main id="interview-screen" class="screen-view">
+      <!-- Quiz Progress Stepper -->
+      <div class="quiz-stepper" id="quiz-stepper">
+        <div class="step step-verbal active" id="step-verbal-indicator">
+          <span class="step-num">1</span>
+          <span class="step-label">Verbal Round</span>
+        </div>
+        <div class="step-divider" id="step-divider-1"></div>
+        <div class="step step-coding" id="step-coding-indicator">
+          <span class="step-num">2</span>
+          <span class="step-label">Coding Assessment</span>
+        </div>
+        <div class="step-divider" id="step-divider-2"></div>
+        <div class="step step-report" id="step-report-indicator">
+          <span class="step-num">3</span>
+          <span class="step-label">Evaluation Report</span>
+        </div>
+      </div>
+
+      <!-- Call Header -->
+      <header class="call-header glass-panel">
+        <div class="call-title-area">
+          <div class="live-indicator">
+            <span class="live-dot"></span>
+            <span>LIVE CALL</span>
+          </div>
+          <h2 id="call-topic-display">React Developer - Mid-Level</h2>
+        </div>
+        <div class="call-stats-area">
+          <div class="stat-badge">
+            <i class="fa-solid fa-clock"></i>
+            <span id="call-timer">00:00</span>
+          </div>
+          <div class="stat-badge">
+            <i class="fa-solid fa-clipboard-question"></i>
+            <span id="question-progress">Q 1 / 5</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Workspace wrapper that adapts dynamically to coding test mode -->
+      <div class="interview-workspace-wrapper">
+
+        <!-- 2. Coding Workspace (Hidden during verbal theory phase) -->
+        <div class="coding-workspace glass-panel" id="coding-workspace" style="display: none;">
+          <div class="coding-workspace-left">
+            <h3 id="coding-problem-title">Coding Challenge: Loading...</h3>
+            <div class="coding-problem-desc" id="coding-problem-desc">
+              Loading challenge statement...
+            </div>
+
+            <div class="test-cases-section">
+              <h4>Test Cases</h4>
+              <div class="test-cases-list" id="test-cases-list">
+                <!-- Test cases dynamically generated -->
+              </div>
+            </div>
+          </div>
+
+          <div class="coding-workspace-right">
+            <div class="editor-header">
+              <span class="editor-lang-badge"><i class="fa-brands fa-js icon-accent"
+                  style="color: #f7df1e; margin-right: 4px;"></i> JavaScript</span>
+              <button type="button" id="run-tests-btn" class="btn btn-primary"
+                style="font-size: 13.5px; padding: 8px 16px; height: auto; aspect-ratio: auto;">
+                <i class="fa-solid fa-play"></i> Run Tests
+              </button>
+            </div>
+            <textarea id="code-editor" class="code-editor-textarea" spellcheck="false"
+              placeholder="// Write your JavaScript code here..."></textarea>
+
+            <div class="coding-actions">
+              <button type="button" id="submit-code-btn" class="btn btn-listen btn-block">
+                <i class="fa-solid fa-circle-check"></i> Submit Coding Test
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Video Feed Grid (2 Windows) -->
+        <div class="call-grid">
+          <!-- 1. Recruiter Pane (3D Avatar) -->
+          <div class="video-window recruiter-window glass-panel">
+            <div id="canvas-container">
+              <!-- Three.js Canvas injected here -->
+            </div>
+            <div class="avatar-loader" id="avatar-loader">
+              <div class="spinner"></div>
+              <p>Loading 3D Recruiter Avatar...</p>
+            </div>
+            <div class="video-label recruiter">
+              <i class="fa-solid fa-user-tie"></i>
+              <span>Interviewer (AI Recruit)</span>
+            </div>
+            <!-- Realtime Speech Subtitles Overlay -->
+            <div class="subtitle-overlay" id="subtitle-overlay">
+              <div class="subtitle-text" id="subtitle-text">
+                Gearing up the session. Please stand by...
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Candidate Pane (Webcam Feed) -->
+          <div class="video-window candidate-window glass-panel">
+            <video id="candidate-webcam" autoplay muted playsinline></video>
+            <div class="video-label candidate">
+              <i class="fa-solid fa-circle-user"></i>
+              <span id="candidate-label">Candidate (You)</span>
+            </div>
+            <!-- Proctor Status Indicator Overlay -->
+            <div class="proctor-status-indicator" id="proctor-status-indicator" style="display: none;">
+              <span class="proctor-metric" id="proctor-metric-face">
+                <i class="fa-solid fa-user"></i> Face: <span class="status-text green">OK</span>
+              </span>
+              <span class="proctor-metric" id="proctor-metric-gaze">
+                <i class="fa-solid fa-eye"></i> Gaze: <span class="status-text green">OK</span>
+              </span>
+              <span class="proctor-metric" id="proctor-metric-audio">
+                <i class="fa-solid fa-volume-high"></i> Audio: <span class="status-text green">OK</span>
+              </span>
+            </div>
+            <!-- Speech Transcript (Candidate) Visual Overlay -->
+            <div class="stt-overlay" id="stt-overlay">
+              <div class="stt-header">
+                <i class="fa-solid fa-microphone-lines mic-listening-icon"></i>
+                <span>Listening...</span>
+              </div>
+              <div class="stt-transcript" id="stt-transcript-text">
+                Say your answer, it will be transcribed here in real time...
+              </div>
+            </div>
+            <!-- Microphone Volume Visualizer Overlay -->
+            <div class="volume-bar-container">
+              <div class="volume-bar" id="volume-indicator"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Chat & Fallback Panel (Collapsible Sidebar on wide layouts) -->
+        <div class="chat-container glass-panel" id="chat-container">
+          <div class="chat-header">
+            <h3><i class="fa-solid fa-comments"></i> Transcript History</h3>
+            <button id="toggle-chat-btn" class="icon-btn"><i class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="chat-messages" id="chat-log">
+            <!-- Live conversation log appended here -->
+            <div class="message recruiter-msg">
+              <span class="msg-sender">Recruiter</span>
+              <div class="msg-bubble">Waiting for interview to start...</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Call Control Bar -->
+      <footer class="call-controls glass-panel">
+        <div class="control-section left">
+          <button id="mic-toggle-btn" class="control-btn" title="Toggle Microphone">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <button id="cam-toggle-btn" class="control-btn" title="Toggle Camera">
+            <i class="fa-solid fa-video"></i>
+          </button>
+          <button id="chat-toggle-btn" class="control-btn" title="Toggle Chat Panel">
+            <i class="fa-solid fa-message"></i>
+          </button>
+        </div>
+
+        <!-- STT Status / Action Center -->
+        <div class="control-section center">
+          <div class="speech-control-area">
+            <div id="mic-status-badge" class="mic-status-badge">
+              <i class="fa-solid fa-microphone"></i>
+              <span id="mic-status-text">Microphone Active</span>
+            </div>
+            <div class="text-input-fallback" id="text-input-fallback-wrapper">
+              <input type="text" id="candidate-text-response" placeholder="Type your answer if mic is disabled...">
+              <button id="submit-text-btn" class="btn btn-secondary-icon"><i
+                  class="fa-solid fa-paper-plane"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-section right">
+          <button id="end-interview-btn" class="btn btn-danger">
+            <i class="fa-solid fa-phone-slash"></i>
+            <span>End Call</span>
+          </button>
+        </div>
+      </footer>
+    </main>
+
+    <!-- PERFORMANCE REPORT SCREEN -->
+    <main id="report-screen" class="screen-view">
+      <header class="report-header">
+        <div class="logo">
+          <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+          <span>AI Interviewer</span>
+        </div>
+        <h1>Interview Feedback Report</h1>
+        <p>Detailed performance analytics compiled by your AI Recruiter.</p>
+      </header>
+
+      <!-- Two-Column Dashboard Layout to fill widescreen monitors professionally -->
+      <div class="report-dashboard-grid">
+
+        <!-- Left Sidebar: Score card, Strengths/Improvements list, and Tips -->
+        <div class="report-sidebar">
+          <!-- Circular Progress Score -->
+          <div class="glass-panel score-card" style="margin-bottom: 20px;">
+            <h2>Overall Score</h2>
+            <div class="progress-ring-container">
+              <svg class="progress-ring" width="180" height="180">
+                <circle class="progress-ring-circle-bg" stroke="#1c2538" stroke-width="12" fill="transparent" r="76"
+                  cx="90" cy="90" />
+                <circle class="progress-ring-circle" id="report-score-circle" stroke="#00f2fe" stroke-dasharray="477.5"
+                  stroke-dashoffset="477.5" stroke-width="12" stroke-linecap="round" fill="transparent" r="76" cx="90"
+                  cy="90" />
+              </svg>
+              <div class="score-display">
+                <span id="report-score-value">0</span><span class="pct">%</span>
+              </div>
+            </div>
+            <div class="score-badge" id="report-level-badge">Passed</div>
+          </div>
+
+          <!-- Strengths / Areas for Improvement -->
+          <div class="glass-panel analysis-card" style="margin-bottom: 20px;">
+            <div class="analysis-column strengths" style="margin-bottom: 20px;">
+              <h3><i class="fa-solid fa-circle-check text-success"></i> Core Strengths</h3>
+              <ul id="strengths-list">
+                <!-- Injected strengths -->
+              </ul>
+            </div>
+            <div class="analysis-column improvements">
+              <h3><i class="fa-solid fa-circle-exclamation text-warning"></i> Key Improvements</h3>
+              <ul id="improvements-list">
+                <!-- Injected improvements -->
+              </ul>
+            </div>
+          </div>
+
+          <!-- Actionable Tips & Recommendations -->
+          <div class="glass-panel tips-card" style="margin-bottom: 20px;">
+            <h2><i class="fa-solid fa-lightbulb icon-accent"></i> Actionable Interview Tips</h2>
+            <ul class="tips-list" id="tips-list"
+              style="display: flex; flex-direction: column; grid-template-columns: 1fr;">
+              <!-- Tips injected -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right Main Panel: Coding Evaluation and Question-by-Question Breakdown -->
+        <div class="report-main-content">
+          <!-- Coding Challenge Evaluation -->
+          <div class="glass-panel breakdown-card" id="coding-report-card" style="margin-bottom: 20px;">
+            <h2><i class="fa-solid fa-code icon-accent"></i> Coding Challenge Evaluation</h2>
+            <div class="coding-report-content">
+              <div class="coding-report-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h4 id="report-coding-title" style="font-size: 16px; font-weight: 600; margin: 0;">Reverse a String</h4>
+                <span class="score-badge" id="report-coding-pass-badge"
+                  style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 12px; border-radius: 8px; font-size: 12.5px;">3
+                  / 3 Passed</span>
+              </div>
+
+              <div class="coding-report-split-grid">
+                <div class="coding-report-split-left">
+                  <h5
+                    style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Submitted Code</h5>
+                  <pre
+                    style="background: #050810; border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 10px; overflow-x: auto; max-height: 250px; margin: 0;"><code id="report-coding-code" style="font-family: 'Fira Code', 'Courier New', monospace; font-size: 12.5px; color: #a5d6ff; line-height: 1.5; white-space: pre;">// Code goes here</code></pre>
+                </div>
+                <div class="coding-report-split-right">
+                  <h5
+                    style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Recruiter Code Review</h5>
+                  <div id="report-coding-feedback"
+                    style="font-size: 13.5px; line-height: 1.6; color: var(--text-muted); background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); padding: 16px; border-radius: 10px; min-height: 200px; max-height: 250px; overflow-y: auto;">
+                    Code review feedback text...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Question-by-Question Breakdown -->
+          <div class="glass-panel breakdown-card">
+            <h2><i class="fa-solid fa-list-check icon-accent"></i> Question-by-Question Breakdown</h2>
+            <div class="breakdown-list" id="report-breakdown-list">
+              <!-- Detailed questions injected -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="report-actions">
+        <button id="restart-interview-btn" class="btn btn-primary">
+          <i class="fa-solid fa-rotate-left"></i>
+          <span>Start New Interview</span>
+        </button>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- LOADER OVERLAY (Glassmorphic) -->
+  <div class="loader-overlay" id="global-loader">
+    <div class="loader-panel glass-panel">
+      <div class="loader-visual">
+        <div class="double-ring">
+          <div></div>
+          <div></div>
+        </div>
+        <i class="fa-solid fa-robot pulse-icon"></i>
+      </div>
+      <h3 id="loader-title">Setting Up Session</h3>
+      <p id="loader-desc">Please wait while we initialize the virtual interview room...</p>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-panel glass-panel">
+      <h2><i class="fa-solid fa-circle-check icon-accent"></i> Confirm Interview Setup</h2>
+      <p class="modal-subtitle">Please verify your details and selected devices before launching the live call.</p>
+
+      <div class="confirm-details-section">
+        <h3>Interview Settings</h3>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Candidate Name</span>
+            <span class="detail-val" id="confirm-candidate-name">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Role / Topic</span>
+            <span class="detail-val" id="confirm-interview-topic">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Difficulty</span>
+            <span class="detail-val" id="confirm-interview-difficulty">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Questions</span>
+            <span class="detail-val" id="confirm-question-count">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Include Coding</span>
+            <span class="detail-val" id="confirm-include-coding">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirm-devices-section">
+        <h3>Active Devices</h3>
+        <div class="devices-list">
+          <div class="confirm-device-item">
+            <i class="fa-solid fa-video icon-accent"></i>
+            <div class="device-info">
+              <span class="device-type">Camera</span>
+              <span class="device-name" id="confirm-camera-name">Default Camera</span>
+            </div>
+          </div>
+          <div class="confirm-device-item">
+            <i class="fa-solid fa-microphone icon-accent"></i>
+            <div class="device-info">
+              <span class="device-type">Microphone</span>
+              <span class="device-name" id="confirm-mic-name">Default Microphone</span>
+            </div>
+          </div>
+          <div class="confirm-device-item" id="confirm-speaker-group">
+            <i class="fa-solid fa-volume-high icon-accent"></i>
+            <div class="device-info">
+              <span class="device-type">Speaker</span>
+              <span class="device-name" id="confirm-speaker-name">Default Speaker</span>
+            </div>
+          </div>
+          <div class="confirm-device-item">
+            <i class="fa-solid fa-camera-rotate icon-accent"></i>
+            <div class="device-info">
+              <span class="device-type">Secondary Camera</span>
+              <span class="device-name" id="confirm-secondary-camera-name">Not Connected</span>
+            </div>
+          </div>
+        </div>
+        <div class="glass-alert warning"
+          style="margin-top: 15px; display: flex; gap: 8px; align-items: flex-start; padding: 10px; border-radius: 8px;">
+          <i class="fa-solid fa-circle-exclamation" style="font-size: 14px; margin-top: 2px;"></i>
+          <p style="font-size: 11.5px; line-height: 1.4; color: var(--text-muted); margin: 0; text-align: left;">
+            To hear the AI recruiter in your headphones, make sure they are set as your system's default audio output
+            device.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" id="confirm-cancel-btn" class="btn btn-secondary-icon"
+          style="aspect-ratio: auto; padding: 14px 24px;">Cancel</button>
+        <button type="button" id="confirm-start-btn" class="btn btn-primary">Launch Interview Call</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHEAT WARNING SECURITY MODAL -->
+  <div class="modal-overlay" id="cheat-warning-modal">
+    <div class="modal-panel glass-panel"
+      style="border: 2px solid var(--color-danger); max-width: 450px; text-align: center;">
+      <h2
+        style="color: var(--color-danger); justify-content: center; font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Security Violation
+      </h2>
+      <p class="modal-subtitle" id="cheat-warning-message"
+        style="margin-top: 10px; font-size: 14.5px; line-height: 1.5; color: var(--text-main);">
+        Tab switch, focus loss, or fullscreen exit detected.
+      </p>
+
+      <div class="confirm-details-section" style="margin-top: 15px; width: 100%;">
+        <div class="details-grid"
+          style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.15); grid-template-columns: 1fr; padding: 20px;">
+          <div class="detail-item"
+            style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span class="detail-label"
+              style="color: var(--color-danger); font-weight: 700; font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase;">Logged
+              Warning Incident Count</span>
+            <span class="detail-val" id="cheat-warning-count"
+              style="font-size: 40px; font-weight: 800; color: #ffffff; margin-top: 6px;">0</span>
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size: 13px; line-height: 1.6; color: var(--text-muted); margin-top: 10px; text-align: center;">
+        Note: Proctoring policies require strict fullscreen focus. Exiting or switching tabs may result in interview
+        disqualification.
+      </p>
+
+      <div class="modal-actions" style="justify-content: center; margin-top: 20px; width: 100%;">
+        <button type="button" id="cheat-resume-btn" class="btn btn-danger btn-block"
+          style="font-weight: 700; font-size: 15px;">
+          <i class="fa-solid fa-expand"></i> Resume & Re-enter Fullscreen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM ALERT POPUP (Enables warnings without exiting fullscreen mode) -->
+  <div class="modal-overlay" id="custom-alert-popup" style="z-index: 10005;">
+    <div class="modal-panel glass-panel" id="custom-alert-box"
+      style="max-width: 400px; text-align: center; padding: 24px;">
+      <h3 id="custom-alert-title"
+        style="font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i class="fa-solid fa-circle-info"></i> Notice
+      </h3>
+      <p id="custom-alert-message" style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
+        Alert message
+      </p>
+      <div class="modal-actions" style="justify-content: center; margin-top: 20px; width: 100%;">
+        <button type="button" id="custom-alert-close-btn" class="btn btn-primary"
+          style="padding: 10px 24px; font-size: 14px; font-weight: 600; width: auto;">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM CONFIRM POPUP (Enables confirmation without exiting fullscreen mode) -->
+  <div class="modal-overlay" id="custom-confirm-popup" style="z-index: 10006;">
+    <div class="modal-panel glass-panel" id="custom-confirm-box"
+      style="max-width: 400px; text-align: center; padding: 24px;">
+      <h3 id="custom-confirm-title"
+        style="font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i class="fa-solid fa-circle-question icon-accent"></i> Confirm Action
+      </h3>
+      <p id="custom-confirm-message" style="font-size: 14px; line-height: 1.5; color: var(--text-muted);">
+        Are you sure?
+      </p>
+      <div class="modal-actions" style="justify-content: center; margin-top: 20px; width: 100%; gap: 12px;">
+        <button type="button" id="custom-confirm-cancel-btn" class="btn btn-secondary-icon"
+          style="padding: 10px 24px; font-size: 14px; font-weight: 600; width: auto; aspect-ratio: auto; height: auto;">
+          Cancel
+        </button>
+        <button type="button" id="custom-confirm-ok-btn" class="btn btn-primary"
+          style="padding: 10px 24px; font-size: 14px; font-weight: 600; width: auto; aspect-ratio: auto; height: auto;">
+          Yes, Submit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript modules -->
+  <!-- We load app.js as an ES Module so it can import Three.js elements -->
+  <script type="module" src="/js/app.js"></script>
+</body>
+
+</html>

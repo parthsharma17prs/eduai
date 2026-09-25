@@ -402,7 +402,7 @@ export default function QuizPlay()
                     <div className="qp-center-content">
                         <div className="qp-avatar-big">{playerName?.charAt(0).toUpperCase()}</div>
                         <h2 className="qp-player-name">{playerName}</h2>
-                        <p className="qp-sub">Waiting for host to start the quiz…</p>
+                        <p className="qp-sub">Ready to begin your live quiz test!</p>
                         <div className="qp-info-card">
                             <div className="qp-info-title">{quizTitle||code}</div>
                             {hostName&&(
@@ -414,6 +414,14 @@ export default function QuizPlay()
                                 <Users size={13} /> {participants.length} player{participants.length!==1? 's':''} joined
                             </div>
                         </div>
+                        <button
+                            type="button"
+                            className="qp-btn-submit"
+                            style={{ marginTop: '1.25rem', padding: '0.85rem 2rem', fontSize: '1.05rem', fontWeight: 600, background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', borderRadius: '10px', color: '#fff', border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(79, 70, 229, 0.4)' }}
+                            onClick={() => socketRef.current?.emit('quiz:start', { code })}
+                        >
+                            🚀 Start Test Immediately
+                        </button>
                         <div className="qp-pulse-ring" />
                     </div>
                 );

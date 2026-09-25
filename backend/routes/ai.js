@@ -64,7 +64,7 @@ Provide at least 4 test cases (2 visible, 2 hidden). Input must be a JSON object
                     },
                     {role: 'user', content: prompt}
                 ],
-                model: 'llama-3.3-70b-versatile',
+                model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
                 temperature: 0.7,
                 max_tokens: 2500,
             },
@@ -228,7 +228,7 @@ Provide detailed feedback in JSON format:
                     },
                     {role: 'user', content: prompt}
                 ],
-                model: 'llama-3.1-70b-versatile',
+                model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
                 temperature: 0.5,
                 max_tokens: 1500,
             },
@@ -304,7 +304,7 @@ Provide detailed feedback in JSON format:
                     },
                     {role: 'user', content: prompt}
                 ],
-                model: 'llama-3.1-70b-versatile',
+                model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
                 temperature: 0.6,
                 max_tokens: 2000,
             },
@@ -367,7 +367,7 @@ Guidelines:
             'https://api.groq.com/openai/v1/chat/completions',
             {
                 messages: messages,
-                model: 'llama-3.1-8b-instant',
+                model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
                 temperature: 0.7,
                 max_tokens: 300,
             },

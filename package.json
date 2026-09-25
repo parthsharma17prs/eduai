@@ -1,0 +1,33 @@
+{
+  "name": "eduai",
+  "version": "1.0.0",
+  "description": "EDU-AI - Next-Gen AI Learning, Placement & Real-Time Interview Platform with 3D Virtual AI Recruiter and Voice Calling",
+  "main": "backend/server.js",
+  "type": "module",
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "start": "cd backend && node server.js",
+    "dev:backend": "cd backend && node server.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+  },
+  "keywords": [
+    "ai-interview",
+    "ai-recruiter",
+    "3d-avatar",
+    "threejs",
+    "voice-ai",
+    "twilio",
+    "ultravox",
+    "webrtc",
+    "proctoring",
+    "railway"
+  ],
+  "author": "parthsharma17prs",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

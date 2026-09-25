@@ -219,13 +219,9 @@ export function createVersionedRouter()
         const version=req.apiVersion;
         const versionData=versionManager.getVersionInfo(version);
 
-        if (!versionData)
+        if (!versionData || !versionData.router)
         {
-            return res.status(400).json({
-                success: false,
-                error: `API version ${version} not found`,
-                availableVersions: versionManager.getAllVersions().map(v => v.version),
-            });
+            return next();
         }
 
         versionData.router(req, res, next);

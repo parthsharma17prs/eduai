@@ -30,7 +30,7 @@ async function generateUniqueCode()
 
 async function callGroq(messages, opts={})
 {
-    const {model='llama-3.3-70b-versatile', temperature=0.6, max_tokens=2000}=opts;
+    const {model=process.env.GROQ_MODEL || 'openai/gpt-oss-120b', temperature=0.6, max_tokens=2000}=opts;
     const res=await axios.post(
         GROQ_URL,
         {messages, model, temperature, max_tokens},

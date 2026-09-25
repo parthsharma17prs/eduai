@@ -17,6 +17,7 @@ import AxiomChat from './pages/AxiomChat'
 import AIInterviewSetup from './pages/AIInterviewSetup'
 import AIInterviewRoom from './pages/AIInterviewRoom'
 import AIInterviewReport from './pages/AIInterviewReport'
+import AIAvatarInterview from './pages/AIAvatarInterview'
 import RecruiterDashboard from './pages/RecruiterDashboard'
 import RecruiterCandidates from './pages/RecruiterCandidates'
 import RecruiterAnalysis from './pages/RecruiterAnalysis'
@@ -97,6 +98,8 @@ function AppLayout()
                     <Route path="/contest/results/:contestId" element={<FeatureProvider role="company"><ContestResults /></FeatureProvider>} />
                     <Route path="/axiom-chat" element={<FeatureProvider role="student"><AxiomChat /></FeatureProvider>} />
                     <Route path="/ai-interview-setup" element={<FeatureProvider role="student"><AIInterviewSetup /></FeatureProvider>} />
+                    <Route path="/ai-avatar-interview" element={<FeatureProvider role="student"><AIAvatarInterview /></FeatureProvider>} />
+                    <Route path="/ai-interview" element={<FeatureProvider role="student"><AIAvatarInterview /></FeatureProvider>} />
                     <Route path="/ai-interview/:sessionId" element={<FeatureProvider role="student"><AIInterviewRoom /></FeatureProvider>} />
                     <Route path="/ai-interview-report/:sessionId" element={<FeatureProvider role="student"><AIInterviewReport /></FeatureProvider>} />
                     <Route path="/coding-practice" element={<FeatureProvider role="student"><CodingPractice /></FeatureProvider>} />

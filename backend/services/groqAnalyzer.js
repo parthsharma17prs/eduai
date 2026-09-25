@@ -5,8 +5,7 @@ class GroqAnalyzer
     constructor()
     {
         this.apiKey=process.env.GROQ_API_KEY;
-        this.apiUrl='https://api.groq.com/openai/v1/chat/completions';
-        this.model='llama-3.3-70b-versatile';
+        this.model=process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
 
         // Debug: Log API key status
         if (this.apiKey)

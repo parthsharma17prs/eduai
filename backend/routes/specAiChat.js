@@ -19,9 +19,10 @@ async function generateWithGroq(messages, systemInstruction)
     })),
   ];
 
+  const model = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
   const response=await axios.post('https://api.groq.com/openai/v1/chat/completions', {
     messages: groqMessages,
-    model: 'llama-3.3-70b-versatile',
+    model: model,
     temperature: 0.7,
     max_tokens: 2048,
     stream: false,

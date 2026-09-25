@@ -137,7 +137,8 @@ class CodeExecutor
         try
         {
             await fs.writeFile(filepath, process.platform==='linux'? sandboxedCode:code);
-            const result=await this.runCommand('python', ['-u', filepath], input);
+            const pythonBin = process.env.PYTHON_BIN || 'python3';
+            const result=await this.runCommand(pythonBin, ['-u', filepath], input);
             await fs.unlink(filepath).catch((e) => console.warn('[CODE-EXEC] Cleanup failed:', e.message));
             return result;
         } catch (error)
