@@ -13,34 +13,37 @@ try {
 const __filename=fileURLToPath(import.meta.url);
 const __dirname=path.dirname(__filename);
 
-// Load environment variables FIRST before anything else
+// Load environment variables from both backend and root directories
 dotenv.config({path: path.join(__dirname, '.env')});
-
+dotenv.config({path: path.join(__dirname, '..', '.env')});
+dotenv.config();
 
 // Validate critical environment variables
-const REQUIRED_ENV_VARS=[
+const REQUIRED_ENV_VARS = [
     'GROQ_API_KEY',
     'MONGODB_URI',
-    'PINECONE_FACE_API_KEY',
-    'PINECONE_FACE_INDEX',
 ];
 
-for (const envVar of REQUIRED_ENV_VARS)
-{
-    if (!process.env[envVar])
-    {
-        console.error(`❌ CRITICAL: Missing required environment variable: ${envVar}`);
-        console.error('   Please set all required variables in .env file before starting the server.');
-        process.exit(1);
-    }
+const OPTIONAL_ENV_VARS = [
+    'PINECONE_FACE_API_KEY',
+    'PINECONE_FACE_INDEX',
+    'TWILIO_ACCOUNT_SID',
+    'TWILIO_AUTH_TOKEN',
+    'TWILIO_PHONE_NUMBER',
+    'ULTRAVOX_API_KEY',
+];
+
+const missingRequired = REQUIRED_ENV_VARS.filter(v => !process.env[v]);
+if (missingRequired.length > 0) {
+    console.warn(`⚠️ WARNING: Missing recommended environment variables: ${missingRequired.join(', ')}`);
+    console.warn('   To enable full AI features in production (e.g. Railway), add these in your Railway service Variables dashboard.');
+} else {
+    console.log('✅ Critical environment variables validated');
 }
 
-console.log('✅ All critical environment variables validated');
-
-// Warn (don't crash) if Cloudinary is not configured
-if (!process.env.CLOUDINARY_CLOUD_NAME||!process.env.CLOUDINARY_API_KEY||!process.env.CLOUDINARY_API_SECRET)
-{
-    console.warn('⚠️  Cloudinary env vars not set – resume uploads will be disabled');
+// Check optional Cloudinary variables
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    console.warn('ℹ️ Cloudinary env vars not set – resume uploads will use local/mock storage');
 }
 
 export default {
