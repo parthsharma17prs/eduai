@@ -202,9 +202,60 @@ graph TD
 
 ---
 
-## 7. Tech Stack Matrix
+---
 
-- **Frontend**: React 18, Vite, Three.js, Lucide Icons, Framer Motion, Axios, Socket.IO Client.
-- **Backend**: Node.js, Express, Socket.IO, Mongoose, Twilio SDK, Axios, JWT, CORS.
-- **AI & ML**: Groq Cloud (Llama 3.3), Ultravox Realtime Voice AI, Pinecone Vector Database, Face-API.js.
-- **Deployment**: Railway Nixpacks, Docker/Procfile compatible, Vercel ready.
+## 7. Comprehensive Technology Stack
+
+| Domain | Technology / Library | Version / Specification | Purpose & Role |
+| :--- | :--- | :--- | :--- |
+| **Frontend Framework** | **React.js** | `^18.3.1` | Declarative component UI library for reactive single-page app |
+| **Build Tool & Bundler** | **Vite** | `^5.4.21` | Lightning-fast HMR and optimized Rollup production bundling |
+| **3D Rendering & WebGL** | **Three.js** | `^0.160.0` | Real-time 3D canvas rendering, lighting, camera, shaders & GLTF morph targets |
+| **Motion & Micro-interactions** | **Framer Motion** | `^11.0.0` | Fluid animations, slide-overs, holographic glows, and state transitions |
+| **Icons & Visuals** | **Lucide React** | `^0.344.0` | Modern SVG iconography with customized active cyber theme styling |
+| **State & API Cache** | **TanStack React Query** | `^5.0.0` | Asynchronous query caching, optimistic UI updates, and stale-time controls |
+| **Routing** | **React Router DOM** | `^7.0.0` | Dynamic client-side routing, protected routes, and role-based views |
+| **Code Editor** | **Monaco Editor / CodeMirror**| `^0.45.0` | Embedded IDE with syntax highlighting, auto-completion, and multi-language support |
+| **Backend Runtime** | **Node.js** | `>=20.0.0 LTS` | High-throughput asynchronous server-side JavaScript runtime |
+| **Web Server Framework** | **Express.js** | `^4.19.2` | RESTful API routing, middleware chaining, and error handling |
+| **Real-Time WebSockets** | **Socket.IO** | `^4.7.5` | Bi-directional event communication for live coding contests, quizzes & proctoring |
+| **Primary Database** | **MongoDB Atlas & Mongoose**| `^8.3.0` | Scalable NoSQL document store with schema validation and indexing |
+| **Vector Database** | **Pinecone** | `@pinecone-database/pinecone` | High-dimensional face biometric vector similarity search |
+| **AI LLM Inference** | **Groq Cloud API** | `Llama 3.3 70B Versatile` | Ultra-low latency (<300ms) adaptive interview question generation & code evaluation |
+| **Voice AI & Telephony** | **Ultravox Realtime API** | `v1 WebSocket Stream` | Full-duplex voice dialog engine with dynamic prompt injection |
+| **Telephony Gateway** | **Twilio Voice API** | `Twilio SDK ^5.0.0` | PSTN mobile outbound calling with bi-directional WebSocket media streams |
+| **Computer Vision / Biometrics** | **Face-API.js & TensorFlow.js** | `SSD Mobilenet v1` | Client-side facial detection, eye gaze tracking, and multiple person detection |
+| **Speech-to-Text (STT)** | **Web Speech API & Deepgram** | Continuous Recognition | Real-time speech transcription during avatar and phone interviews |
+| **Text-to-Speech (TTS)** | **SpeechSynthesis & ElevenLabs**| Neural Voices | Natural voice generation and avatar lip-sync viseme driving |
+| **Security & Hardening** | **Helmet, bcrypt, jsonwebtoken**| Production Grade | JWT authentication, cryptographic password hashing, and HTTP security headers |
+| **Containerization & Cloud** | **Railway Nixpacks & Docker** | Node 20 / Alpine | Cloud infrastructure deployment, automated CI/CD builds, and single-port serving |
+| **Reverse Proxy & Routing** | **Express Static Proxy** | Native Node.js | Single-dyno architecture serving compiled `/dist` frontend + `/api` backend |
+
+---
+
+## 8. Development & Production Environment Matrix
+
+```bash
+# Node.js Environment
+NODE_ENV=production
+PORT=5001
+
+# AI & LLM Engine Keys
+GROQ_API_KEY=gsk_...
+ULTRAVOX_API_KEY=...
+
+# Cloud Voice & PSTN Telephony
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=...
+TWILIO_PHONE_NUMBER=+1...
+NGROK_URL=https://...
+
+# Database & Vector Store
+MONGODB_URI=mongodb+srv://...
+PINECONE_API_KEY=...
+PINECONE_INDEX=eduai-biometrics
+
+# JWT & Authentication
+JWT_SECRET=super_secret_jwt_key
+```
+
