@@ -4,7 +4,9 @@ frontend/node_modules/
 resume-verifier-v2/venv/
 
 **/node_modules/
-**/dist/
+# Allow frontend/dist for cloud deployments
+!frontend/dist/
+!frontend/dist/**
 
 whiteboard frontend/node_modules/
 whiteboard frontend/dist/
