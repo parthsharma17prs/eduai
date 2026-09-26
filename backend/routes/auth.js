@@ -11,6 +11,50 @@ import sendEmail, {isEmailConfigured} from '../services/sendEmail.js';
 
 const router=express.Router();
 
+// ── Demo Accounts Definition ─────────────────────────────────────────
+export const DEMO_ACCOUNTS = [
+  {
+    username: 'demo_student',
+    email: 'student@hirespec.demo',
+    password: 'demo123',
+    role: 'candidate',
+    companyName: '',
+    bio: 'Computer Science student passionate about full-stack development.',
+    skills: ['JavaScript', 'React', 'Node.js', 'Python', 'MongoDB'],
+    profileComplete: 85,
+  },
+  {
+    username: 'demo_company',
+    email: 'company@hirespec.demo',
+    password: 'demo123',
+    role: 'company_admin',
+    companyName: 'TechCorp Solutions',
+    bio: 'Leading tech company specializing in AI and cloud solutions.',
+    skills: [],
+    profileComplete: 90,
+  },
+  {
+    username: 'demo_recruiter',
+    email: 'recruiter@hirespec.demo',
+    password: 'demo123',
+    role: 'recruiter',
+    companyName: 'TechCorp Solutions',
+    bio: 'Senior Technical Recruiter at TechCorp Solutions.',
+    skills: [],
+    profileComplete: 80,
+  },
+  {
+    username: 'demo_admin',
+    email: 'admin@hirespec.demo',
+    password: 'demo123',
+    role: 'admin',
+    companyName: 'EDU-AI',
+    bio: 'Platform administrator with full access to all admin features.',
+    skills: [],
+    profileComplete: 100,
+  },
+];
+
 // ── JWT Configuration ──────────────────────────────────────────────
 const JWT_SECRET=process.env.JWT_SECRET||'dev-secret-key-change-in-production';
 const JWT_EXPIRY='7d';
@@ -33,8 +77,6 @@ function setTokenCookie(res, token)
     maxAge: 7*24*60*60*1000, // 7 days
   });
 }
-
-
 
 // ── Helpers ─────────────────────────────────────────────────────────
 function generateOTP(length=6)
@@ -375,7 +417,7 @@ router.post('/login', async (req, res) =>
     const token=generateToken(user._id.toString());
     setTokenCookie(res, token);
 
-    // Return user data (no token in response)
+    // Return user data and token
     return APIResponse.success(res, {
       user: {
         id: user._id,
@@ -386,6 +428,7 @@ router.post('/login', async (req, res) =>
         github: user.github || '',
         createdAt: user.createdAt,
       },
+      token,
     }, 'Login successful');
   } catch (err)
   {
@@ -699,49 +742,6 @@ router.get('/me', async (req, res) =>
 });
 
 // ── Seed Demo Accounts ──────────────────────────────────────────────
-const DEMO_ACCOUNTS=[
-  {
-    username: 'demo_student',
-    email: 'student@hirespec.demo',
-    password: 'demo123',
-    role: 'candidate',
-    companyName: '',
-    bio: 'Computer Science student passionate about full-stack development.',
-    skills: ['JavaScript', 'React', 'Node.js', 'Python', 'MongoDB'],
-    profileComplete: 85,
-  },
-  {
-    username: 'demo_company',
-    email: 'company@hirespec.demo',
-    password: 'demo123',
-    role: 'company_admin',
-    companyName: 'TechCorp Solutions',
-    bio: 'Leading tech company specializing in AI and cloud solutions.',
-    skills: [],
-    profileComplete: 90,
-  },
-  {
-    username: 'demo_recruiter',
-    email: 'recruiter@hirespec.demo',
-    password: 'demo123',
-    role: 'recruiter',
-    companyName: 'TechCorp Solutions',
-    bio: 'Senior Technical Recruiter at TechCorp Solutions.',
-    skills: [],
-    profileComplete: 80,
-  },
-  {
-    username: 'demo_admin',
-    email: 'admin@hirespec.demo',
-    password: 'demo123',
-    role: 'admin',
-    companyName: 'EDU-AI',
-    bio: 'Platform administrator with full access to all admin features.',
-    skills: [],
-    profileComplete: 100,
-  },
-];
-
 router.post('/seed-demo', async (req, res) =>
 {
   try
