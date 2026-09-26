@@ -25,18 +25,13 @@ export async function connectMongoDB()
     console.log('✅ MongoDB connected successfully');
   } catch (error)
   {
-    console.warn(`⚠️  Primary MongoDB connection failed (${error.message}). Attempting fallback to local MongoDB...`);
-    try {
-      await mongoose.connect('mongodb://127.0.0.1:27017/hirespec', {
-        dbName: 'hirespec',
-        serverSelectionTimeoutMS: 5000,
-      });
-      isConnected=true;
-      console.log('✅ Connected successfully to local MongoDB fallback (mongodb://127.0.0.1:27017/hirespec)');
-    } catch (fallbackErr) {
-      console.warn('⚠️ MongoDB connection could not be established immediately:', error.message);
-      console.warn('   Server will continue running in memory / fallback mode and retry in background.');
-    }
+    console.warn(`⚠️ Primary MongoDB connection failed (${error.message}).`);
+    console.warn('   Note: If using MongoDB Atlas, ensure 0.0.0.0/0 is whitelisted in Atlas Network Access.');
+    // Schedule background retry in 30 seconds
+    setTimeout(() => {
+      isConnected = false;
+      connectMongoDB().catch(() => {});
+    }, 30000);
   }
 
   mongoose.connection.on('error', (err) =>
