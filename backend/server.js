@@ -131,29 +131,22 @@ app.use('/api/coding-practice/prompt', aiRateLimiter, aiTimeoutMiddleware);
 // General API rate limiting
 app.use('/api/', apiRateLimiter);
 
-// Initialize MongoDB (non-blocking for server startup)
-try {
-    console.log('[SERVER] Initializing MongoDB connection...');
-    await connectMongoDB();
-} catch (err) {
-    console.warn('[SERVER] ⚠️ MongoDB initial connection failed:', err.message);
-}
+// Initialize MongoDB asynchronously (never blocks HTTP server startup)
+console.log('[SERVER] Initializing MongoDB connection...');
+connectMongoDB().catch(err => {
+    console.warn('[SERVER] ⚠️ MongoDB background connection warning:', err.message);
+});
 
-// Initialize Redis cache (optional but recommended)
-try
-{
-    console.log('[SERVER] Initializing Redis cache...');
-    await initializeRedis({
-        host: process.env.REDIS_HOST||'localhost',
-        port: process.env.REDIS_PORT||6379,
-        password: process.env.REDIS_PASSWORD,
-    });
+// Initialize Redis cache (optional, non-blocking)
+initializeRedis({
+    host: process.env.REDIS_HOST || 'localhost',
+    port: process.env.REDIS_PORT || 6379,
+    password: process.env.REDIS_PASSWORD,
+}).then(() => {
     console.log('[SERVER] ✅ Redis initialized');
-} catch (err)
-{
-    console.warn('[SERVER] ⚠️ Redis initialization failed, continuing without cache:', err.message);
-    console.warn('[SERVER] Note: Some features like distributed sessions may not work across instances');
-}
+}).catch(err => {
+    console.warn('[SERVER] ℹ️ Redis initialization skipped, continuing without cache');
+});
 
 // Start OTP cleanup scheduler
 try
@@ -163,8 +156,7 @@ try
     console.log('[SERVER] ✅ OTP cleanup scheduler started');
 } catch (err)
 {
-    console.error('[SERVER] ❌ OTP cleanup scheduler failed:', err.message);
-    // Don't exit - OTP cleanup is nice-to-have, not critical
+    console.warn('[SERVER] ⚠️ Failed to start OTP cleanup scheduler:', err.message);
 }
 
 // Error logging middleware (runs after routes but before error handler)
