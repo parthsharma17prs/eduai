@@ -231,7 +231,9 @@ app.get('/live', (req, res) =>
 
 // Serve frontend static build (Railway / Production deployment)
 const candidateDistPaths = [
+    path.join(__dirname, 'public'),
     path.join(__dirname, '../frontend/dist'),
+    path.join(process.cwd(), 'backend/public'),
     path.join(process.cwd(), 'frontend/dist'),
     path.join(process.cwd(), 'dist'),
     path.join(__dirname, 'dist'),
