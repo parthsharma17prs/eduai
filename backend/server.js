@@ -62,19 +62,19 @@ const {logger: log}=initializeLogging({
     serviceName: 'interview-platform-backend',
 });
 
-const FRONTEND_URLS=(process.env.FRONTEND_URL||'http://localhost:5173,http://localhost:5174').split(',').map(u => u.trim());
+const FRONTEND_URLS = (process.env.FRONTEND_URL || 'http://localhost:5173,http://localhost:5174').split(',').map(u => u.trim());
 
-const io=new Server(httpServer, {
+const io = new Server(httpServer, {
     cors: {
-        origin: FRONTEND_URLS,
+        origin: true,
         methods: ['GET', 'POST'],
         credentials: true,
     },
 });
 
-// Middleware
+// Middleware - Allow origin reflection so Railway custom domains and local dev both work
 app.use(cors({
-    origin: FRONTEND_URLS,
+    origin: (origin, callback) => callback(null, true),
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-API-Version'],
@@ -89,21 +89,6 @@ app.use(express.urlencoded({limit: '50mb', extended: true}));
 
 // Security headers middleware
 app.use(securityHeadersMiddleware);
-
-// HTTPS enforcement in production
-if (process.env.NODE_ENV==='production')
-{
-    app.use((req, res, next) =>
-    {
-        if (req.header('x-forwarded-proto')!=='https')
-        {
-            res.redirect(`https://${req.header('host')}${req.url}`);
-        } else
-        {
-            next();
-        }
-    });
-}
 
 // Request timeout middleware
 app.use(timeoutMiddleware);
@@ -250,18 +235,28 @@ app.get('/live', (req, res) =>
 });
 
 // Serve frontend static build (Railway / Production deployment)
-const frontendDistPath = path.join(__dirname, '../frontend/dist');
-if (fs.existsSync(frontendDistPath))
-{
+const candidateDistPaths = [
+    path.join(__dirname, '../frontend/dist'),
+    path.join(process.cwd(), 'frontend/dist'),
+    path.join(process.cwd(), 'dist'),
+    path.join(__dirname, 'dist'),
+];
+
+const frontendDistPath = candidateDistPaths.find(p => fs.existsSync(p));
+
+if (frontendDistPath) {
     console.log('[SERVER] Serving static frontend build from:', frontendDistPath);
     app.use(express.static(frontendDistPath));
-    app.get('*', (req, res, next) =>
-    {
-        if (req.path.startsWith('/api') || req.path.startsWith('/socket.io') || req.path.startsWith('/twiml') || req.path.startsWith('/webhook'))
-        {
+    app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api') || req.path.startsWith('/socket.io') || req.path.startsWith('/twiml') || req.path.startsWith('/webhook') || req.path === '/health' || req.path === '/ready' || req.path === '/live') {
             return next();
         }
         res.sendFile(path.join(frontendDistPath, 'index.html'));
+    });
+} else {
+    console.warn('[SERVER] Warning: Frontend build dist folder not found. Checked:', candidateDistPaths);
+    app.get('/', (req, res) => {
+        res.status(200).send('<h2>EDU-AI Backend is running. Frontend build was not found.</h2><p><a href="/api/health">Check API Health</a></p>');
     });
 }
 
@@ -304,15 +299,18 @@ app.use((err, req, res, next) =>
 setupSocketHandlers(io);
 setupContestSocketHandlers(io);
 
-const PORT=process.env.PORT||5000;
-httpServer.listen(PORT, () =>
+const PORT = Number(process.env.PORT) || 5001;
+const HOST = '0.0.0.0';
+
+httpServer.listen(PORT, HOST, () =>
 {
     logger.info(`Backend server started`, {
         port: PORT,
+        host: HOST,
         environment: process.env.NODE_ENV||'development',
         mongodbUri: process.env.MONGODB_URI? 'configured':'missing',
     });
-    console.log(`🚀 Backend running on http://localhost:${PORT}`);
+    console.log(`🚀 Backend running on http://${HOST}:${PORT}`);
     console.log(`📡 WebSocket server ready`);
     console.log(`🔒 Environment: ${process.env.NODE_ENV||'development'}`);
     console.log(`📊 Logging to: console, files, ${process.env.SENTRY_DSN? 'Sentry':'local only'}`);
