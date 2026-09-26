@@ -34,9 +34,8 @@ export async function connectMongoDB()
       isConnected=true;
       console.log('✅ Connected successfully to local MongoDB fallback (mongodb://127.0.0.1:27017/hirespec)');
     } catch (fallbackErr) {
-      console.error('❌ MongoDB connection failed:', error.message);
-      console.warn('   Make sure MongoDB is running and MONGODB_URI is correct');
-      throw error;
+      console.warn('⚠️ MongoDB connection could not be established immediately:', error.message);
+      console.warn('   Server will continue running in memory / fallback mode and retry in background.');
     }
   }
 

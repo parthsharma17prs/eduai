@@ -131,9 +131,13 @@ app.use('/api/coding-practice/prompt', aiRateLimiter, aiTimeoutMiddleware);
 // General API rate limiting
 app.use('/api/', apiRateLimiter);
 
-// Initialize MongoDB
-console.log('[SERVER] Initializing MongoDB connection...');
-await connectMongoDB();
+// Initialize MongoDB (non-blocking for server startup)
+try {
+    console.log('[SERVER] Initializing MongoDB connection...');
+    await connectMongoDB();
+} catch (err) {
+    console.warn('[SERVER] ⚠️ MongoDB initial connection failed:', err.message);
+}
 
 // Initialize Redis cache (optional but recommended)
 try
