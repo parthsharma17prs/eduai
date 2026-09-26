@@ -210,16 +210,15 @@ try
 }
 
 // Enhanced health check endpoint
-app.get('/api/health', (req, res) =>
+app.get(['/health', '/api/health'], (req, res) =>
 {
-    res.json({
+    res.status(200).json({
         status: 'ok',
         message: 'Server is operational',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         environment: {
-            mongodbConnected: true, // TODO: Check actual connection status
-            redisConnected: false, // TODO: Check actual Redis status
+            nodeEnv: process.env.NODE_ENV || 'development',
             apiVersion: '1.0.0'
         }
     });
