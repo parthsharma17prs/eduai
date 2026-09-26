@@ -5,9 +5,10 @@ import {Code2, Clock, Trophy, Users, Play, Send, CheckCircle, XCircle, AlertTria
 import CodeEditor from '../components/CodeEditor';
 import ProctoringMonitor from '../components/ProctoringMonitor';
 import proctoringService from '../services/proctoring';
+import {API_BASE_URL} from '../services/api';
 import './ContestPlay.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 const DIFFICULTY_COLORS={easy: '#22c55e', medium: '#f59e0b', hard: '#ef4444'};
 

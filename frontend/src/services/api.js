@@ -1,7 +1,10 @@
 import axios from 'axios';
 import {authService} from './authService.js';
 
-const API_BASE_URL=import.meta.env.VITE_API_URL||'http://localhost:5001';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 
+    (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' 
+        ? window.location.origin 
+        : 'http://localhost:5001');
 
 const api=axios.create({
     baseURL: `${API_BASE_URL}/api`,
@@ -136,5 +139,4 @@ export const interviewChat=(data) => api.post('/ai/interview-chat', data);
 export const getProfile=() => api.get('/profile');
 export const updateProfile=(data) => api.put('/profile', data);
 
-export {API_BASE_URL};
 export default api;

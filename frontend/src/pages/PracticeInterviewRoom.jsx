@@ -7,9 +7,10 @@ import
     MessageSquare, BarChart3, TrendingUp, HelpCircle, Send
 } from 'lucide-react';
 import AIAvatarView from '../components/AIAvatarView';
+import {API_BASE_URL} from '../services/api';
 import './PracticeInterviewRoom.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5001';
+const API_URL = API_BASE_URL;
 
 function PracticeInterviewRoom()
 {

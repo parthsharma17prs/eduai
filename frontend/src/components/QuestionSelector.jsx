@@ -1,8 +1,9 @@
 import {useState, useEffect} from 'react';
 import {FileText as DocumentIcon, Book as BookIcon, Bot as RobotIcon, CheckCircle as CheckCircleIcon, RefreshCw as RefreshIcon, Folder as FolderIcon, Sparkles as SparklesIcon, Loader2 as LoadingIcon} from 'lucide-react';
+import {API_BASE_URL} from '../services/api';
 import './QuestionSelector.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5001';
+const API_URL = API_BASE_URL;
 
 function QuestionSelector({onQuestionSelected, onClose})
 {

@@ -1,9 +1,10 @@
-﻿import {useState, useEffect, useCallback} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {Code2, Plus, Globe, Gamepad2, Trash2, Play, Trophy, Users, Clock, Zap, ChevronRight, Sparkles, Settings, Eye, EyeOff, AlertCircle} from 'lucide-react';
+import {API_BASE_URL} from '../services/api';
 import './ContestDashboard.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 const DIFFICULTY_COLORS={easy: '#22c55e', medium: '#f59e0b', hard: '#ef4444'};
 const STATUS_LABELS={draft: 'Draft', waiting: 'Open', active: 'Live', completed: 'Ended'};

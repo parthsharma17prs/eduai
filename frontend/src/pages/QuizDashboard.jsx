@@ -1,8 +1,9 @@
 import {useState, useEffect, useCallback} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+import {API_BASE_URL} from '../services/api';
 import './QuizDashboard.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 const DIFFICULTY_COLORS={easy: '#22c55e', medium: '#f59e0b', hard: '#ef4444'};
 const STATUS_LABELS={draft: 'Draft', waiting: 'Open', active: 'Live', question_open: 'Live', question_closed: 'Live', completed: 'Ended'};

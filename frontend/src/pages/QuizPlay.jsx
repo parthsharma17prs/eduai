@@ -4,9 +4,10 @@ import {io} from 'socket.io-client';
 import {Video, VideoOff, Mic, MicOff, LogOut, Trophy, Clock, Users, Wifi, ChevronLeft, ChevronRight, CheckCircle, ShieldAlert, AlertTriangle} from 'lucide-react';
 import ProctoringMonitor from '../components/ProctoringMonitor';
 import proctoringService from '../services/proctoring';
+import {API_BASE_URL} from '../services/api';
 import './QuizPlay.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 const OPTION_COLORS=['#3b82f6', '#ef4444', '#f59e0b', '#22c55e'];
 const OPTION_LABELS=['A', 'B', 'C', 'D'];

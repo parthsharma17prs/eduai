@@ -1,9 +1,10 @@
 import {useState, useEffect, useCallback} from 'react';
 import {io} from 'socket.io-client';
+import {API_BASE_URL} from '../services/api';
 import './ProctorDashboard.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
-const SOCKET_URL=import.meta.env.VITE_SOCKET_URL||'http://localhost:5000';
+const API_URL = API_BASE_URL;
+const SOCKET_URL = API_BASE_URL;
 
 function ProctorDashboard()
 {

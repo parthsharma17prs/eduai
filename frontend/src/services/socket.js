@@ -1,7 +1,8 @@
 import {io} from 'socket.io-client';
 import {authService} from './authService.js';
+import {API_BASE_URL} from './api.js';
 
-const SOCKET_URL=import.meta.env.VITE_API_URL||'http://localhost:5001';
+const SOCKET_URL = API_BASE_URL;
 
 class SocketService
 {

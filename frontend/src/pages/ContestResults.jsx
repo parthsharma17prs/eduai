@@ -1,9 +1,10 @@
 import {useState, useEffect} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
 import {Code2, Trophy, Users, Clock, BarChart3, ChevronLeft, CheckCircle, XCircle, Award} from 'lucide-react';
+import {API_BASE_URL} from '../services/api';
 import './ContestResults.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 const DIFFICULTY_COLORS={easy: '#22c55e', medium: '#f59e0b', hard: '#ef4444'};
 

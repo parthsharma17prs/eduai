@@ -2,7 +2,7 @@ import {useState, useEffect, useRef, useCallback} from 'react';
 import {useParams, useSearchParams, useNavigate} from 'react-router-dom';
 import socketService from '../services/socket';
 import proctoringService from '../services/proctoring';
-import {getInterview, createInterview, getQuestion, executeCode, submitCode, endInterview} from '../services/api';
+import {getInterview, createInterview, getQuestion, executeCode, submitCode, endInterview, API_BASE_URL} from '../services/api';
 import CodeEditor from '../components/CodeEditor';
 import VideoPanel from '../components/VideoPanel';
 import ProctoringMonitor from '../components/ProctoringMonitor';
@@ -292,7 +292,7 @@ function InterviewRoom()
             {
                 try
                 {
-                    await fetch(`${import.meta.env.VITE_API_URL||'http://localhost:5000'}/api/proctoring/session`, {
+                    await fetch(`${API_BASE_URL}/api/proctoring/session`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         credentials: 'include',

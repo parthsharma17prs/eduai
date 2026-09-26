@@ -6,9 +6,10 @@ import
     CheckCircle, XCircle, BookOpen, FileText, Search,
     Home, RefreshCw, TrendingUp
 } from 'lucide-react';
+import {API_BASE_URL} from '../services/api';
 import './PracticeFeedback.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5001';
+const API_URL = API_BASE_URL;
 
 function PracticeFeedback()
 {

@@ -11,7 +11,7 @@ import
   Palette, Server, Layers, Wrench, Smartphone, Monitor, MessageSquare, Terminal, Zap,
   Smile, Minus, Flame, Lightbulb, ClipboardList, GitBranch, Menu, X, Link2
 } from 'lucide-react';
-import api, {getMyInterviews} from '../services/api';
+import api, {getMyInterviews, API_BASE_URL} from '../services/api';
 import {useFeatures} from '../services/FeatureContext';
 import CodeEditor from '../components/CodeEditor';
 import CodingPractice from './CodingPractice';
@@ -2206,7 +2206,7 @@ function LiveContestTab({user})
 {
   const navigate=useNavigate();
   const {features}=useFeatures();
-  const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
+  const API_URL=API_BASE_URL;
   const [contests, setContests]=useState([]);
   const [loading, setLoading]=useState(true);
   const [joinCode, setJoinCode]=useState('');
@@ -2323,7 +2323,7 @@ function LiveQuizTab({user})
 {
   const navigate=useNavigate();
   const {features}=useFeatures();
-  const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
+  const API_URL=API_BASE_URL;
   const [quizzes, setQuizzes]=useState([]);
   const [loading, setLoading]=useState(true);
   const [joinCode, setJoinCode]=useState('');

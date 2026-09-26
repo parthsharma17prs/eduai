@@ -11,7 +11,7 @@ import
   Brain, FileBarChart, ExternalLink, Phone, Mail, Crown, Hash, GitBranch
 } from 'lucide-react';
 import Chart from 'react-apexcharts';
-import api, {createInterview, scheduleInterview, getJobInterviews} from '../services/api';
+import api, {createInterview, scheduleInterview, getJobInterviews, API_BASE_URL} from '../services/api';
 import {useFeatures} from '../services/FeatureContext';
 import './CompanyDashboard.css';
 
@@ -85,13 +85,13 @@ function CompanyDashboard()
     setLoadingQuizzes(true);
     try
     {
-      const res=await fetch(`${import.meta.env.VITE_API_URL||'http://localhost:5000'}/api/quiz/my-quizzes`, {credentials: 'include'});
+      const res=await fetch(`${API_BASE_URL}/api/quiz/my-quizzes`, {credentials: 'include'});
       if (res.ok) {const data=await res.json(); setQuizzes(data.quizzes||[]);}
     } catch (e) {console.error('Fetch quizzes error:', e);}
     finally {setLoadingQuizzes(false);}
   };
 
-  const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
+  const API_URL=API_BASE_URL;
 
   const resetQuizWizard=() =>
   {
@@ -1740,7 +1740,7 @@ function CompanyDashboard()
                       {q.status==='draft'&&(
                         <>
                           <button className="cmpd-btn-secondary cmpd-btn-sm" onClick={() => navigate('/quiz/dashboard')}><Settings size={14} /> Edit</button>
-                          {q.questionCount>0&&<button className="cmpd-btn-primary cmpd-btn-sm" onClick={async () => {try {await fetch(`${import.meta.env.VITE_API_URL||'http://localhost:5000'}/api/quiz/${q.id}/publish`, {method: 'POST', credentials: 'include'}); fetchCompanyQuizzes();} catch {} }}>Publish</button>}
+                          {q.questionCount>0&&<button className="cmpd-btn-primary cmpd-btn-sm" onClick={async () => {try {await fetch(`${API_BASE_URL}/api/quiz/${q.id}/publish`, {method: 'POST', credentials: 'include'}); fetchCompanyQuizzes();} catch {} }}>Publish</button>}
                         </>
                       )}
                       {q.status==='waiting'&&features['company.quiz.host'] !== false&&(

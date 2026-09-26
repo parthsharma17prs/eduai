@@ -2,9 +2,10 @@ import {useState, useEffect, useRef, useCallback} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
 import {io} from 'socket.io-client';
 import {Code2, Clock, Users, Trophy, Play, Square, BarChart3, CheckCircle, AlertTriangle, ChevronRight} from 'lucide-react';
+import {API_BASE_URL} from '../services/api';
 import './ContestHost.css';
 
-const API_URL=import.meta.env.VITE_API_URL||'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 function fmtTime(totalSec)
 {
